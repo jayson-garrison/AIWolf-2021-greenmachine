@@ -1,0 +1,7 @@
+TODO:
+
+06/07/21
+1.) setup git 
+2.) install client server
+3.) register for the competition
+4.) figure out WSL on Grey's end
