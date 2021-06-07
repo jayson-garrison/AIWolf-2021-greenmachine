@@ -1,0 +1,10 @@
+Deadlines:
+
+~Sen states that we need an impletation by the 25th of June
+
+~~1st week is a familiarization phase to get used to software and read some prelim
+  info; also look into some stats and read previous submission docs and code. Also 
+  sort out logistics regarding harware such as WSL and any IDEs and/or programming 
+  language.
+
+~~2nd week
