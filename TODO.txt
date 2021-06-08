@@ -1,7 +1,14 @@
 TODO:
 
-06/07/21
+06/07/21 Grey's end
 1.) setup git 
 2.) install client server
 3.) register for the competition
 4.) figure out WSL on Grey's end
+
+06/08/2021
+1.) look into past code
+2.) research werewolf strat guides
+3.) play werewolf (maybe)
+4.) probability
+5.) look into the given repo
