@@ -1,3 +1,11 @@
+# NOTICE
+
+This repo contains property that is respectfully owned by those who organized the AIWolf ANAC-2021 competition. (see links below). Therefore all propety hence mentioned is owned by the respective owners. Their repo was needed to add to this one since we are participating in the challenge
+
+-Jayson C. Garrison
+The University of Tulsa
+TU MASTERS
+
 # AIWolfPy
 
 Create python agents that can play Werewolf, following the specifications of the [AIWolf Project](http://aiwolf.org)
