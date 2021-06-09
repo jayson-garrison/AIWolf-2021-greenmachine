@@ -1,3 +1,8 @@
+# On second thought I dont think we should use a base agent as each agent will use a different strat based on
+# common actions such as Vote, Talk, etc. So then we should instead just implement each method differently
+# per each class. This may also speed up our run time as well. 
+# -Jayson C. Garrison
+
 #!/usr/bin/env python
 from __future__ import print_function, division
 
@@ -14,9 +19,9 @@ import aiwolfpy
 import aiwolfpy.contentbuilder as cb
 import logging, json
 
-myname = 'reporter'
+# myname = 'reporter' # define for each class instance based on role
 
-class SampleAgent(object):
+class grnBaseAgent(object):
     def __init__(self, agent_name):
         # myname
         self.myname = agent_name
@@ -67,9 +72,11 @@ class SampleAgent(object):
         logging.debug("# TALK")
         return cb.over()
 
+''' Only for Werewolf players
     def whisper(self):
         logging.debug("# WHISPER")
         return cb.over()
+'''
 
     # targetted actions: Require the id of the target
     # agent as the return
@@ -77,17 +84,24 @@ class SampleAgent(object):
         logging.debug("# VOTE")
         return self.base_info['agentIdx']
 
-    def attack(self):
+''' Actions that are exclusive to certain players
+
+    # Werewolf only 
+    def attack(self): 
         logging.debug("# ATTACK")
         return self.base_info['agentIdx']
 
+    # Seer only
     def divine(self):
         logging.debug("# DIVINE")
         return self.base_info['agentIdx']
 
+    # Bodyguard only
     def guard(self):
         logging.debug("# GUARD")
         return self.base_info['agentIdx']
+
+'''
 
     # Finish (no return)
     def finish(self):
