@@ -15,7 +15,7 @@ import aiwolfpy
 import aiwolfpy.contentbuilder as cb
 import logging, json
 
-myname = 'grnVillager'
+myname = 'greenmachine'
 
 class grnVillager(object):
     def __init__(self, agent_name):

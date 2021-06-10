@@ -1,3 +1,4 @@
+
 # 2.1
 def estimate(target, role):
     return 'ESTIMATE Agent[' + "{0:02d}".format(target) + '] ' + role
@@ -45,3 +46,6 @@ def over():
 # 3
 def request(text):
     return 'REQUEST(' + text + ''
+   
+
+# \/ NEW PROTOCOLS CODE BELOW \/
