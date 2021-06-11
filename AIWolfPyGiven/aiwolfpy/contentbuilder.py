@@ -1,6 +1,6 @@
 # cb is constructed according to regulations on http://aiwolf.org/control-panel/wp-content/uploads/2019/05/protocol_3_6.pdf
 
-# 2.1
+# 2.1 should be good
 def estimate(subject, target, role):
     return 'Agent[' + "{0:02d}".format(subject) + '] ESTIMATE Agent[' + "{0:02d}".format(target) + '] ' + role
 
@@ -8,7 +8,7 @@ def comingout(subject, target, role):
     return 'Agent[' + "{0:02d}".format(subject) + '] COMINGOUT Agent[' + "{0:02d}".format(target) + '] ' + role
 
 # 2.2
-def divinization(target):
+def divinization(subject, target):
     return 'Agent[' + "{0:02d}".format(subject) + '] DIVINIZATION Agent[' + "{0:02d}".format(target) + ']'
     
 def guard(subject, target):
