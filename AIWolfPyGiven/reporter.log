@@ -1,0 +1,673 @@
+# GETNAME
+# INITIALIZE
+Game Setting:
+{
+  "enableNoAttack": false,
+  "enableNoExecution": false,
+  "enableRoleRequest": true,
+  "maxAttackRevote": 1,
+  "maxRevote": 1,
+  "maxSkip": 2,
+  "maxTalk": 10,
+  "maxTalkTurn": 20,
+  "maxWhisper": 10,
+  "maxWhisperTurn": 20,
+  "playerNum": 5,
+  "randomSeed": 4951822617224830471,
+  "roleNumMap": {
+    "BODYGUARD": 0,
+    "FREEMASON": 0,
+    "FOX": 0,
+    "ANY": 0,
+    "SEER": 1,
+    "WEREWOLF": 1,
+    "VILLAGER": 2,
+    "MEDIUM": 0,
+    "POSSESSED": 1
+  },
+  "talkOnFirstDay": false,
+  "timeLimit": -1,
+  "validateUtterance": true,
+  "votableInFirstDay": false,
+  "voteVisible": true,
+  "whisperBeforeRevote": false
+}
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day        type  idx  turn  agent                          text
+0    0  initialize    5     0      5  COMINGOUT Agent[05] WEREWOLF
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# DAYSTART
+# UPDATE
+Request:
+DAILY_FINISH
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# DAYSTART
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    1  talk    0     0      4  Skip
+1    1  talk    1     0      1  Skip
+# TALK
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    1  talk    2     0      5  Skip
+1    1  talk    3     0      2  Skip
+2    1  talk    4     0      3  Skip
+3    1  talk    5     1      3  Skip
+# TALK
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    1  talk    6     1      5  Skip
+1    1  talk    7     1      1  Skip
+2    1  talk    8     1      4  Skip
+3    1  talk    9     1      2  Skip
+4    1  talk   10     2      4  Over
+# TALK
+# UPDATE
+Request:
+DAILY_FINISH
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    1  talk   11     2      5  Over
+1    1  talk   12     2      2  Over
+2    1  talk   13     2      3  Over
+3    1  talk   14     2      1  Over
+# UPDATE
+Request:
+VOTE
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# VOTE
+# UPDATE
+Request:
+VOTE
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent            text
+0    1  vote    1    -1      5  VOTE Agent[05]
+1    1  vote    2    -1      3  VOTE Agent[03]
+2    1  vote    3    -1      2  VOTE Agent[02]
+3    1  vote    4    -1      2  VOTE Agent[02]
+4    1  vote    5    -1      3  VOTE Agent[03]
+# VOTE
+# UPDATE
+Request:
+ATTACK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day     type  idx  turn  agent            text
+0    1     vote    1     0      2  VOTE Agent[02]
+1    1     vote    2     0      3  VOTE Agent[03]
+2    1     vote    3     0      4  VOTE Agent[04]
+3    1     vote    4     0      2  VOTE Agent[02]
+4    1     vote    5     0      2  VOTE Agent[02]
+5    1  execute    0     0      2            Over
+# ATTACK
+# UPDATE
+Request:
+ATTACK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# ATTACK
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 2,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day    type  idx  turn  agent              text
+0    1  attack    0     0      4  ATTACK Agent[04]
+1    2    dead    0     0      4              Over
+# DAYSTART
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 2,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    2  talk    0     0      3  Skip
+1    2  talk    1     0      1  Skip
+# TALK
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 2,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    2  talk    2     0      5  Skip
+1    2  talk    3     1      1  Skip
+2    2  talk    4     1      3  Skip
+# TALK
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 2,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    2  talk    5     1      5  Skip
+# TALK
+# UPDATE
+Request:
+DAILY_FINISH
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 2,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent  text
+0    2  talk    6     2      5  Over
+1    2  talk    7     2      3  Over
+2    2  talk    8     2      1  Over
+# UPDATE
+Request:
+VOTE
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 2,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10,
+    "5": 10
+  },
+  "remainWhisperMap": {
+    "5": 10
+  },
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# VOTE
+# UPDATE
+Request:
+FINISH
+Base Info:
+{
+  "agentIdx": 5,
+  "myRole": "WEREWOLF",
+  "roleMap": {
+    "5": "WEREWOLF"
+  },
+  "day": 3,
+  "remainTalkMap": {
+    "1": 10,
+    "3": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "DEAD",
+    "3": "ALIVE",
+    "4": "DEAD",
+    "5": "DEAD"
+  }
+}
+Diff Data:
+   day    type  idx  turn  agent                           text
+0    3  finish    1     0      1   COMINGOUT Agent[01] VILLAGER
+1    3  finish    2     0      2  COMINGOUT Agent[02] POSSESSED
+2    3  finish    3     0      3   COMINGOUT Agent[03] VILLAGER
+3    3  finish    4     0      4       COMINGOUT Agent[04] SEER
+4    3  finish    5     0      5   COMINGOUT Agent[05] WEREWOLF
+# FINISH
