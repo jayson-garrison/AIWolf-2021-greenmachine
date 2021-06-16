@@ -6,6 +6,9 @@ This repo contains property that is respectfully owned by those who organized th
 The University of Tulsa
 TU MASTERS
 
+# Team Members
+	Jayson C. Garrison,	Grey K. Bodi,	James A. Hale
+
 # AIWolfPy
 
 Create python agents that can play Werewolf, following the specifications of the [AIWolf Project](http://aiwolf.org)
