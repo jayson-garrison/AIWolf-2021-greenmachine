@@ -6,7 +6,7 @@ Ground up begin by Jayson C. Garrison
 '''
 
 # import resources
-import AIWolfPyGiven.aiwolfpy
+from ..aiwolfpy import *
 #import AIWolfPyGiven.grnAgent
 
 import AIWolfPyGiven.aiwolfpy.contentbuilder as cb
@@ -123,4 +123,4 @@ agent = grnAgent(name)
 
 if __name__ == '__main__':
     AIWolfPyGiven.aiwolfpy.connect_parse(agent)
-    
+
