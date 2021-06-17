@@ -79,7 +79,7 @@ class grnVillager(object):
         logging.debug("# FINISH")
         return None
 
-agent = SampleAgent(myname)
+agent = grnVillager(myname)
 
 # run
 if __name__ == '__main__':

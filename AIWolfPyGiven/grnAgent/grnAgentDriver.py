@@ -6,7 +6,7 @@ Ground up begin by Jayson C. Garrison
 '''
 
 # import resources
-#import AIWolfPyGiven.aiwolfpy
+import AIWolfPyGiven.aiwolfpy
 #import AIWolfPyGiven.grnAgent
 
 import AIWolfPyGiven.aiwolfpy.contentbuilder as cb
@@ -23,11 +23,15 @@ import AIWolfPyGiven.grnAgent.grnBodyguard as Bodyguard
 import AIWolfPyGiven.grnAgent.grnPossessed as Possessed
 import AIWolfPyGiven.grnAgent.grnWerewolf as Werewolf
 
+# name the agent as our team name 
+
+name = 'grnmachine'
+
 class grnAgent(object):
 
     # initialize
     def __init__(self, agentName):
-        self.myName = 'grnmachine' # our name 
+        self.myName = agentName # our name 
         self.role = None # no role yet by default
     
     # get the name
@@ -111,7 +115,12 @@ class grnAgent(object):
     def finish(self):
         return self.role.finish()
 
-# run the agent
+# run the agent, needs verification
 
-agent = grnAgent()
+agent = grnAgent(name)
+
+# connect
+
+if __name__ == '__main__':
+    AIWolfPyGiven.aiwolfpy.connect_parse(agent)
     
