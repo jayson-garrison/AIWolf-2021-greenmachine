@@ -42,6 +42,24 @@ class grnVillager(object):
         self.game_setting = game_setting
         # print(base_info)
         # print(diff_data)
+        self.alive = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
+        self.COs = {player: 0 for player in self.alive} #our own COs would be self.COs[self.base_info['agentIdx']]
+        self.votedme = set() #players who voted for me
+        self.divined_broadcasts = set()
+        self.initialized_broadcasts = set()
+        self.others = self.alive.copy().remove(self.base_info['agentIdx']) #when our own data is not needed
+        self.agreers = {player: 0 for player in self.others} #all other players who tend to agree with me
+        self.disagreers = {player: 0 for player in self.other} #^^ but disagree
+        self.dead = set()
+        self.executed = set()
+        self.killed = set() #make sure executed + killed = dead
+        self.likely_human = set()
+        self.likely_werewolf = set()
+        self.unknown = self.others.copy() #not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
+        self.requesters = set() #agens who request something of me
+
+
+
 
     # new information (no return)
     # add to lists (majority of the work)
