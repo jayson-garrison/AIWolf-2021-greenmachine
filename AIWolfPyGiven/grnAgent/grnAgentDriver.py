@@ -6,14 +6,15 @@ Ground up begin by Jayson C. Garrison
 '''
 
 # import resources
-import aiwolfpy
+from ..grnAgent import grnAgent
+
 import aiwolfpy.contentbuilder as cb
 
 # all 
 import grnVillager as Villager
 
 # Jayson
-import grnSeer as Seer
+import grnSeer.py as Seer
 import grnMedium as Medium
 import grnBodyguard as Bodyguard
 
