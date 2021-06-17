@@ -19,8 +19,9 @@ myname = 'greenmachine'
 
 class grnVillager(object):
     def __init__(self, agent_name):
-        # myname
-        self.myname = agent_name
+        self.myname = agent_name # agent name 
+
+        # initialize log 
         logging.basicConfig(filename=self.myname+".log",
                             level=logging.DEBUG,
                             format='')
@@ -60,6 +61,7 @@ class grnVillager(object):
 
     # Start of the day (no return)
     def dayStart(self):
+        self.talkTurn = 0 # keep track of number of times we have talked today 
         logging.debug("# DAYSTART")
         return None
 
@@ -67,8 +69,16 @@ class grnVillager(object):
     # protocol string as the return.
     # act based on the lists
     def talk(self):
-        logging.debug("# TALK")
-        return cb.over()
+        logging.debug("# TALK") # not sure where we need to put this 
+        if self.talkTurn < 10: # max of 10 talks 
+            self.talkTurn += 1
+            # if it is day 1, skip talking since there is no info, unless someone
+            # requests us to CO, Vote, Agree, etc
+            if self.base_info['myRole'] == 'VILLAGER' and not mentioned and int(self.base_info['day']) == 1:
+                return cb.skip()
+            return # talk 
+        else:
+            return cb.over() # by default, ret over
 
     # targetted actions: Require the id of the target
     # agent as the return
@@ -82,12 +92,14 @@ class grnVillager(object):
         logging.debug("# FINISH")
         return None
 
+# Do not need this as the driver function initializes it
+''' 
 agent = grnVillager(myname)
 
 # run
 if __name__ == '__main__':
     AIWolfPyGiven.aiwolfpy.connect_parse(agent)
-
+'''
 
 
 

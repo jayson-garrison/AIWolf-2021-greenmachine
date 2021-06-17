@@ -6,6 +6,9 @@ Ground up begin by Jayson C. Garrison
 '''
 
 # import resources
+from ..aiwolfpy import contentbuilder
+import AIWolfPyGiven
+import AIWolfPyGiven.grnAgent
 import AIWolfPyGiven.aiwolfpy
 #import AIWolfPyGiven.grnAgent
 
