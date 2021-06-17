@@ -7,7 +7,7 @@ The University of Tulsa
 TU MASTERS
 
 # Team Members
-	Jayson C. Garrison,	Grey K. Bodi,	James A. Hale
+	Jayson C. Garrison,     Grey K. Bodi,     James A. Hale
 
 # AIWolfPy
 

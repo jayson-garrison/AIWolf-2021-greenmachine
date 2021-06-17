@@ -6,21 +6,22 @@ Ground up begin by Jayson C. Garrison
 '''
 
 # import resources
-from ..grnAgent import grnAgent
+#import AIWolfPyGiven.aiwolfpy
+#import AIWolfPyGiven.grnAgent
 
-import aiwolfpy.contentbuilder as cb
+import AIWolfPyGiven.aiwolfpy.contentbuilder as cb
 
 # all 
-import grnVillager as Villager
+import AIWolfPyGiven.grnAgent.grnVillager as Villager
 
 # Jayson
-import grnSeer.py as Seer
-import grnMedium as Medium
-import grnBodyguard as Bodyguard
+import AIWolfPyGiven.grnAgent.grnSeer as Seer
+import AIWolfPyGiven.grnAgent.grnMedium as Medium
+import AIWolfPyGiven.grnAgent.grnBodyguard as Bodyguard
 
 # Grey
-import grnPossessed as Possessed
-import grnWerewolf as Werewolf
+import AIWolfPyGiven.grnAgent.grnPossessed as Possessed
+import AIWolfPyGiven.grnAgent.grnWerewolf as Werewolf
 
 class grnAgent(object):
 

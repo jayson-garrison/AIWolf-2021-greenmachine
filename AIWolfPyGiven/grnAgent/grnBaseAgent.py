@@ -15,7 +15,7 @@ from __future__ import print_function, division
 # information that it received from the server, which can
 # be useful when developing your own client.
 
-import aiwolfpy
+from AIWolf-2021-greenmachine import aiwolfpy
 import aiwolfpy.contentbuilder as cb
 import logging, json
 
