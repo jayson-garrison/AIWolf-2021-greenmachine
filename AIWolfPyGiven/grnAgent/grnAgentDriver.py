@@ -27,7 +27,7 @@ class grnAgent(object):
 
     # initialize
     def __init__(self, agentName):
-        self.myName = agentName # our name 
+        self.myName = 'grnmachine' # our name 
         self.role = None # no role yet by default
     
     # get the name
@@ -47,3 +47,71 @@ class grnAgent(object):
         if self.game_setting['playerNum'] == 15: # this should always be the case I think
             if myRole == 'SEER':
                 self.role = Seer(self.myName)
+            elif myRole == 'MEDIUM':
+                self.role = Medium(self.myName)
+            elif myRole == 'BODYGUARD':
+                self.role = Bodyguard(self.myName)
+            elif myRole == 'POSSESSED':
+                self.role = Possessed(self.myName)
+            elif myRole == 'WEREWOLF':
+                self.role = Werewolf(self.myName)
+            else:
+                self.role = Villager(self.myName)
+
+    # action functions, if an exception occurs, perform a standard action
+    
+    def update(self, base_info, diff_data, request):
+        try:
+            self.role.update(base_info, diff_data, request)
+        except Exception:
+            pass
+    
+    def dayStart(self):
+        try:
+            self.role.dayStart()
+        except Exception:
+            pass
+
+    def talk(self):
+        try:
+            return self.role.talk()
+        except Exception:
+            return cb.over()
+
+    def vote(self):
+        try:
+            return self.role.vote()
+        except Exception:
+            return 1
+
+    def divine(self):
+        try:
+            return self.role.divine()
+        except Exception:
+            return 1
+
+    def guard(self):
+        try:
+            return self.role.guard()
+        except Exception:
+            return 1
+
+    def whisper(self):
+        try:
+            return self.role.whisper()
+        except Exception:
+            return cb.over()
+
+    def attack(self):
+        try:
+            return self.role.attack()
+        except Exception:
+            return 1
+
+    def finish(self):
+        return self.role.finish()
+
+# run the agent
+
+agent = grnAgent()
+    
