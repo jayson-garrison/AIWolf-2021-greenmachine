@@ -119,7 +119,7 @@ class grnAgent(object):
 
 agent = grnAgent(name)
 
-# connect
+# connect and run 
 
 if __name__ == '__main__':
     AIWolfPyGiven.aiwolfpy.connect_parse(agent)

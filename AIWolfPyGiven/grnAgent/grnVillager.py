@@ -11,8 +11,8 @@ from __future__ import print_function, division
 # information that it received from the server, which can
 # be useful when developing your own client.
 
-import aiwolfpy
-import aiwolfpy.contentbuilder as cb
+import AIWolfPyGiven.aiwolfpy
+import AIWolfPyGiven.aiwolfpy.contentbuilder as cb
 import logging, json
 
 myname = 'greenmachine'
@@ -44,6 +44,7 @@ class grnVillager(object):
         # print(diff_data)
 
     # new information (no return)
+    # add to lists (majority of the work)
     def update(self, base_info, diff_data, request):
         logging.debug("# UPDATE")
         logging.debug("Request:")
@@ -64,12 +65,14 @@ class grnVillager(object):
 
     # conversation actions: require a properly formatted
     # protocol string as the return.
+    # act based on the lists
     def talk(self):
         logging.debug("# TALK")
         return cb.over()
 
     # targetted actions: Require the id of the target
     # agent as the return
+    # act based on the lists
     def vote(self):
         logging.debug("# VOTE")
         return self.base_info['agentIdx']
@@ -83,7 +86,7 @@ agent = grnVillager(myname)
 
 # run
 if __name__ == '__main__':
-    aiwolfpy.connect_parse(agent)
+    AIWolfPyGiven.aiwolfpy.connect_parse(agent)
 
 
 
