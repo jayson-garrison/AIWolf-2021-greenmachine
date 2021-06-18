@@ -92,7 +92,7 @@ class grnVillager(object):
             self.talkTurn += 1
             # if it is day 1, skip talking since there is no info, unless someone
             # requests us to CO, Vote, Agree, etc
-            if self.base_info['myRole'] == 'VILLAGER' and not mentioned and int(self.base_info['day']) == 1:
+            if self.base_info['myRole'] == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
                 return cb.skip()
             return # talk 
         else:
