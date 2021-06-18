@@ -103,8 +103,8 @@ class grnVillager(object):
     # act based on the lists
     def vote(self):
         logging.debug("# VOTE")
-        for targ in COs:
-            if "WEREWOLF" in COs[targ]:
+        for targ in self.COs:
+            if "WEREWOLF" in self.COs[targ]:
                 return targ
 
         return self.base_info['agentIdx']
