@@ -77,6 +77,7 @@ class grnVillager(object):
         # print(base_info)
         # print(diff_data)
 
+
     # Start of the day (no return)
     def dayStart(self):
         self.talkTurn = 0 # keep track of number of times we have talked today 
