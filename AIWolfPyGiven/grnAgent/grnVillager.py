@@ -44,7 +44,7 @@ class grnVillager(object):
         # print(base_info)
         # print(diff_data)
         self.alive = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
-        self.COs = {player: 0 for player in self.alive} #our own COs would be self.COs[self.base_info['agentIdx']]
+        self.COs = {player: "" for player in self.alive} #our own COs would be self.COs[self.base_info['agentIdx']]
         self.votedme = set() #players who voted for me
         self.divined_broadcasts = set()
         self.initialized_broadcasts = set()
@@ -77,6 +77,7 @@ class grnVillager(object):
         # print(base_info)
         # print(diff_data)
 
+
     # Start of the day (no return)
     def dayStart(self):
         self.talkTurn = 0 # keep track of number of times we have talked today 
@@ -103,6 +104,10 @@ class grnVillager(object):
     # act based on the lists
     def vote(self):
         logging.debug("# VOTE")
+        for targ in COs:
+            if "WEREWOLF" in self.COs[targ]:
+                return targ
+
         return self.base_info['agentIdx']
 
     # Finish (no return)
