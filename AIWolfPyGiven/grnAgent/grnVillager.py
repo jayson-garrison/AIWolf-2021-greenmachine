@@ -58,6 +58,11 @@ class grnVillager(object):
         self.likely_werewolf = set()
         self.unknown = self.others.copy() #not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
         self.requesters = set() #agens who request something of me
+        # an empty list that will be used as a 2d array of strings to track agent talks.
+        # it resets everyday and is filled in the update fx when server requests the talk fx
+        # contents take the form: "[who] [text]" where the row is the turn and the col is the
+        # text.
+        self.agent_talks = [] 
 
 
 

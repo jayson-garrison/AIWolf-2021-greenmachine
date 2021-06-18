@@ -18,3 +18,9 @@ print( nd('Billy ', sent ) )
 
 x = 25
 print("testSTR" + str(x) )
+
+list = [0]
+
+print(list)
+list.append([5,3])
+print(list)
