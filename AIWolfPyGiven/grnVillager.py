@@ -11,13 +11,13 @@ from __future__ import print_function, division
 # information that it received from the server, which can
 # be useful when developing your own client.
 
-import AIWolfPyGiven.aiwolfpy
-import AIWolfPyGiven.aiwolfpy.contentbuilder as cb
+import aiwolfpy
+import aiwolfpy.contentbuilder as cb
 import logging, json
 
 myname = 'greenmachine'
 
-class grnVillager(object):
+class Villager(object):
     def __init__(self, agent_name):
         self.myname = agent_name # agent name 
 

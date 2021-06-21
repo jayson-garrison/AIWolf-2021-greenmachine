@@ -87,6 +87,9 @@ def logicalnot(subject, sentence):
 def day(subject, daynumber, sentence):
     return 'Agent[' + "{0:02d}".format(subject) + '] DAY ' + str(daynumber) + '(' + sentence + ') '
 
+def test():
+    print("HIIIII")
+
 
 
 

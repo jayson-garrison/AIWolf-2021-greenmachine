@@ -4,18 +4,19 @@
 # -Jayson C. Garrison
 
 #!/usr/bin/env python
-from __future__ import print_function, division
-
-# This sample script connects to the AIWolf server
-# and responds appropriately to all server requests.
-# It does not say anything and gives itself as the
-# target id for any request, resulting in random actions.
-
-# Additionally, it prints to the standard input all the
-# information that it received from the server, which can
-# be useful when developing your own client.
-
-from AIWolf-2021-greenmachine import aiwolfpy
+# from __future__ import print_function, division
+#
+# # This sample script connects to the AIWolf server
+# # and responds appropriately to all server requests.
+# # It does not say anything and gives itself as the
+# # target id for any request, resulting in random actions.
+#
+# # Additionally, it prints to the standard input all the
+# # information that it received from the server, which can
+# # be useful when developing your own client.
+#
+# from AIWolf-2021-greenmachine
+# import aiwolfpy
 import aiwolfpy.contentbuilder as cb
 import logging, json
 

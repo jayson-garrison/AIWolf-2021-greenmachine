@@ -6,32 +6,32 @@ Ground up begin by Jayson C. Garrison
 '''
 
 # import resources
-from ..aiwolfpy import contentbuilder
-import AIWolfPyGiven
-import AIWolfPyGiven.grnAgent
-import AIWolfPyGiven.aiwolfpy
-#import AIWolfPyGiven.grnAgent
+# import aiwolfpy
+from aiwolfpy import contentbuilder
+# import AIWolfPyGiven.grnAgent
+import aiwolfpy
+# import grnAgent
 
-import AIWolfPyGiven.aiwolfpy.contentbuilder as cb
+from aiwolfpy import contentbuilder as cb
 
 # all 
-import AIWolfPyGiven.grnAgent.grnVillager as Villager
+import grnVillager as Villager
 
 # Jayson
-import AIWolfPyGiven.grnAgent.grnSeer as Seer
-import AIWolfPyGiven.grnAgent.grnMedium as Medium
-import AIWolfPyGiven.grnAgent.grnBodyguard as Bodyguard
+import grnSeer as Seer
+import grnMedium as Medium
+import grnBodyguard as Bodyguard
 
 # Grey
-import AIWolfPyGiven.grnAgent.grnPossessed as Possessed
-import AIWolfPyGiven.grnAgent.grnWerewolf as Werewolf
+import grnPossessed as Possessed
+import grnWerewolf as Werewolf
 
 # name the agent as our team name 
 
 name = 'grnmachine'
 
-class grnAgent(object):
 
+class grnAgent(object):
     # initialize
     def __init__(self, agentName):
         self.myName = agentName # our name 
@@ -51,19 +51,19 @@ class grnAgent(object):
 
         # assign role behavior
         myRole = base_info['myRole']
-        if self.game_setting['playerNum'] == 15: # this should always be the case I think
+        if self.game_setting['playerNum'] == 15:  # this should always be the case I think
             if myRole == 'SEER':
-                self.role = Seer(self.myName)
+                self.role = Seer.Seer(self.myName)
             elif myRole == 'MEDIUM':
-                self.role = Medium(self.myName)
+                self.role = Medium.Medium(self.myName)
             elif myRole == 'BODYGUARD':
-                self.role = Bodyguard(self.myName)
+                self.role = Bodyguard.BodyGuard(self.myName)
             elif myRole == 'POSSESSED':
-                self.role = Possessed(self.myName)
+                self.role = Possessed.Possessed(self.myName)
             elif myRole == 'WEREWOLF':
-                self.role = Werewolf(self.myName)
+                self.role = Werewolf.Werewolf(self.myName)
             else:
-                self.role = Villager(self.myName)
+                self.role = Villager.Villager(self.myName)
 
     # action functions, if an exception occurs, perform a standard action
     
@@ -74,56 +74,60 @@ class grnAgent(object):
             pass
     
     def dayStart(self):
+        pass
         try:
             self.role.dayStart()
         except Exception:
             pass
 
     def talk(self):
+        return cb.over()
         try:
             return self.role.talk()
         except Exception:
             return cb.over()
 
     def vote(self):
+        return 1
         try:
             return self.role.vote()
         except Exception:
             return 1
 
     def divine(self):
+        return 1
         try:
             return self.role.divine()
         except Exception:
             return 1
 
     def guard(self):
+        return 1
         try:
             return self.role.guard()
         except Exception:
             return 1
 
     def whisper(self):
+        return cb.over()
         try:
             return self.role.whisper()
         except Exception:
             return cb.over()
 
     def attack(self):
+        return 1
         try:
             return self.role.attack()
         except Exception:
             return 1
 
     def finish(self):
-        return self.role.finish()
+        return None
+        # return self.role.finish()
 
-# run the agent, needs verification
-
-agent = grnAgent(name)
-
-# connect and run 
 
 if __name__ == '__main__':
-    AIWolfPyGiven.aiwolfpy.connect_parse(agent)
-    
+    # run the agent, needs verification
+    aiwolfpy.connect_parse(grnAgent(name))
+
