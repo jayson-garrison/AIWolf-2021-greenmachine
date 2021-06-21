@@ -12,7 +12,7 @@ from __future__ import print_function, division
 # be useful when developing your own client.
 
 import aiwolfpy
-import aiwolfpy.contentbuilder as cb
+from aiwolfpy import contentbuilder as cb
 import logging, json
 
 myname = 'greenmachine'
@@ -63,6 +63,7 @@ class Villager(object):
         # contents take the form: "[who] [text]" where the row is the turn and the col is the
         # text.
         self.agent_talks = [] 
+        #self.rowCount = 0
 
 
 
@@ -81,6 +82,23 @@ class Villager(object):
         self.base_info = base_info
         # print(base_info)
         # print(diff_data)
+
+        # update the talk list 
+        currentDay = int(self.base_info['day'])
+        for row in diff_data.itertuples():
+            type = getattr(row,"type")
+            text = getattr(row,"text")
+            if type == 'talk': # then gather the text
+                talker = getattr(row, 'agent')
+                rowCount = int(getattr(row, 'turn'))
+                talkString = str(talker) + text
+                self.agent_talks[rowCount].append(talkString)
+        # if a new day. reset the talks
+        if not (currentDay == int(self.base_info['day']) ):
+            self.agent_talks = []
+
+
+
 
 
     # Start of the day (no return)

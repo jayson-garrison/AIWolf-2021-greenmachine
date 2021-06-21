@@ -1,3 +1,4 @@
+'''
 import AIWolfPyGiven.aiwolfpy
 print("Hello")
 print("Hello1.5")
@@ -24,3 +25,11 @@ list = [0]
 print(list)
 list.append([5,3])
 print(list)
+'''
+
+g = [
+[1,2,3,4]
+
+]
+
+print(g)

@@ -14,17 +14,19 @@ import aiwolfpy
 
 from aiwolfpy import contentbuilder as cb
 
-# all 
+# Jayson and Grey
 import grnVillager as Villager
+import grnWerewolf as Werewolf
 
 # Jayson
 import grnSeer as Seer
-import grnMedium as Medium
-import grnBodyguard as Bodyguard
 
 # Grey
 import grnPossessed as Possessed
-import grnWerewolf as Werewolf
+
+# James
+import grnMedium as Medium
+import grnBodyguard as Bodyguard
 
 # name the agent as our team name 
 
