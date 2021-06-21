@@ -81,14 +81,13 @@ class grnAgent(object):
             pass
 
     def talk(self):
-        return cb.over()
         try:
             return self.role.talk()
-        except Exception:
+        except Exception as err:
+            print(err)
             return cb.over()
 
     def vote(self):
-        return 1
         try:
             return self.role.vote()
         except Exception:

@@ -8,26 +8,26 @@ class Possessed(object):
     def __init__(self, my_name):
         self.name = my_name
 
-    def update(self):
+    def update(self, base_info, diff_data, request):
         pass
 
     def dayStart(self):
         pass
 
     def talk(self):
-        pass
+        return "Over"
 
     def vote(self):
-        pass
+        return 1
 
     def divine(self):
         pass
 
     def guard(self):
-        return 0
+        return 1
 
     def whisper(self):
-        pass
+        return "Over"
 
     def attack(self):
         pass

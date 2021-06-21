@@ -43,9 +43,8 @@ class GameInfoParser(object):
         })
         self.rows_returned = len(self.pd_dict["day"])
         return ret_df
-        
-        
-                
+
+
     def update(self, game_info, talk_history, whisper_history, request):
         # print(request)
         # print(game_info)
