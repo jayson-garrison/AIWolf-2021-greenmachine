@@ -83,18 +83,35 @@ class Villager(object):
         # print(base_info)
         # print(diff_data)
 
-        # update the talk list 
+        # scan diff_data for different info based on type
         currentDay = int(self.base_info['day'])
         for row in diff_data.itertuples():
             type = getattr(row,"type")
             text = getattr(row,"text")
+            
+            # update executed players
+            if type == 'execute':
+                self.executed.add( int(getattr(row, 'agent')) )
+                self.dead.add( int(getattr(row, 'agent')) )
+
+            # update dead players
+            if type == 'dead':
+                self.killed.add( int(getattr(row, 'agent')) )
+                self.dead.add( int(getattr(row, 'agent')) )
+
+            # update voting 
+            if type == 'vote': # then...
+                pass
+
+            # update the talk list
             if type == 'talk': # then gather the text
                 talker = getattr(row, 'agent')
-                rowCount = int(getattr(row, 'turn'))
+                rowCount = int( getattr(row, 'turn') )
                 talkString = str(talker) + text
                 self.agent_talks[rowCount].append(talkString)
+                
         # if a new day. reset the talks
-        if not (currentDay == int(self.base_info['day']) ):
+        if not (currentDay == int( self.base_info['day']) ):
             self.agent_talks = []
 
 
