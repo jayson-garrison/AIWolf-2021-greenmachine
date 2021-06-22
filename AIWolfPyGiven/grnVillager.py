@@ -127,6 +127,8 @@ class Villager(object):
         # for new talks do:
         #endPos = len(self.agent_talks)
         while self.nthTalk < len(self.agent_talks):
+
+            # agent 0
             if "VOTE" in self.agent_talks[self.nthTalk]:
                 pass
             if "COMINGOUT" in self.agent_talks[self.nthTalk]:
@@ -143,6 +145,8 @@ class Villager(object):
                 pass # add to likely bodyguard
             if "BECAUSE" in self.agent_talks[self.nthTalk]:
                 pass
+
+            # agent 1
             if "NOT" in self.agent_talks[self.nthTalk]:
                 pass
             if "AND" in self.agent_talks[self.nthTalk]:
@@ -152,10 +156,6 @@ class Villager(object):
             if "XOR" in self.agent_talks[self.nthTalk]:
                 pass
             self.nthTalk += 1
-
-
-
-
 
 
     # Start of the day (no return)
