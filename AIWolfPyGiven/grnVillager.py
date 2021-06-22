@@ -66,6 +66,8 @@ class Villager(object):
         # text.
         self.agent_talks = [] 
         self.nthTalk = 0
+        self.estimate_votes = {player: [] for player in self.alive}
+        self.currentDay = 0
 
 
 
@@ -86,7 +88,13 @@ class Villager(object):
         # print(diff_data)
 
         # scan diff_data for different info based on type
-        currentDay = int(self.base_info['day'])
+
+        # if a new day. reset the talks, estimate votes
+        if not (self.currentDay == int( self.base_info['day']) ):
+            self.agent_talks = []
+            self.estimate_votes = {player: [] for player in self.alive}
+
+        self.currentDay = int(self.base_info['day'])
         for row in diff_data.itertuples():
             type = getattr(row,"type")
             text = getattr(row,"text")
@@ -119,10 +127,7 @@ class Villager(object):
                 self.agent_talks.append(talkString)
                 '''
 
-        # if a new day. reset the talks
-        if not (currentDay == int( self.base_info['day']) ):
-            self.agent_talks = []
-            self.agent_talks = 0
+        
 
         # for new talks do:
         #endPos = len(self.agent_talks)
@@ -130,12 +135,21 @@ class Villager(object):
 
             # agent 0
             if "VOTE" in self.agent_talks[self.nthTalk]:
-                pass
+                
+                voter = self.agent_talks[self.nthTalk][1]
+                voted = self.agent_talks[self.nthTalk][2][11:13]
+                if '0' in voted:
+                    voted.replace('0', '')
+                if voter not in self.estimate_votes:
+                    self.estimate_votes[voted].append(voter)
+                else:
+                    self.estimate_votes[voted].remove(voter)
+                    self.estimate_votes[voted].append(voter)
+                    
             if "COMINGOUT" in self.agent_talks[self.nthTalk]:
                 pass # add to COs
             if "ESTIMATE" in self.agent_talks[self.nthTalk]:
                 pass # add to estimators and assign roles accordingly
-            if "REQUEST" in self.agent_talks[self.nthTalk]:
                 pass # add to requestors and evaluate if a reasonable request
             if "DIVINED" in self.agent_talks[self.nthTalk]:
                 pass # add to diviners
@@ -143,10 +157,16 @@ class Villager(object):
                 pass # add to likely mediums 
             if "GUARDED" in self.agent_talks[self.nthTalk]:
                 pass # add to likely bodyguard
-            if "BECAUSE" in self.agent_talks[self.nthTalk]:
+
+            # agent 0.5
+            if "INQUIRE" in self.agent_talks[self.nthTalk]:
+                pass # add to estimators and assign roles accordingly
+            if "REQUEST" in self.agent_talks[self.nthTalk]:
                 pass
 
             # agent 1
+            if "BECAUSE" in self.agent_talks[self.nthTalk]:
+                pass
             if "NOT" in self.agent_talks[self.nthTalk]:
                 pass
             if "AND" in self.agent_talks[self.nthTalk]:
