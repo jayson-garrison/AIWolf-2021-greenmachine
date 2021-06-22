@@ -44,7 +44,7 @@ class Villager(object):
         # print(base_info)
         # print(diff_data)
         self.alive = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
-        self.COs = {player: "" for player in self.alive} # our own COs would be self.COs[self.base_info['agentIdx']]
+        self.COs = {player: [] for player in self.alive} # our own COs would be self.COs[self.base_info['agentIdx']]
         self.votedme = set() # players who voted for me
         self.divined_broadcasts = set()
         self.initialized_broadcasts = set()
@@ -107,40 +107,49 @@ class Villager(object):
 
             # update the talk list
             if type == 'talk': # then gather the text
-                talker = getattr(row, 'agent')
+                talkList = [int(getattr(row, 'turn')), "{0:02d}".format( int(getattr(row, 'agent')) ), str(text) ]
+                self.agent_talks.append(talkList)
+
+                '''
+                turn = 
+                talker =  "{0:02d}".format( int(getattr(row, 'agent')) ) 
                 #rowCount = int( getattr(row, 'turn') )
-                talkString = str(talker) + text
+                talkString = str(talker) + ' ' + str(text)
                 #self.agent_talks[rowCount].append(talkString)
                 self.agent_talks.append(talkString)
+                '''
 
         # if a new day. reset the talks
         if not (currentDay == int( self.base_info['day']) ):
             self.agent_talks = []
+            self.agent_talks = 0
 
         # for new talks do:
         #endPos = len(self.agent_talks)
         while self.nthTalk < len(self.agent_talks):
-            if not ( self.agent_talks[self.nthTalk].rfind("COMINGOUT") == -1 ):
+            if "VOTE" in self.agent_talks[self.nthTalk]:
+                pass
+            if "COMINGOUT" in self.agent_talks[self.nthTalk]:
                 pass # add to COs
-            if not ( self.agent_talks[self.nthTalk].rfind("ESTIMATE") == -1 ):
+            if "ESTIMATE" in self.agent_talks[self.nthTalk]:
                 pass # add to estimators and assign roles accordingly
-            if not ( self.agent_talks[self.nthTalk].rfind("REQUEST") == -1 ):
+            if "REQUEST" in self.agent_talks[self.nthTalk]:
                 pass # add to requestors and evaluate if a reasonable request
-            if not ( self.agent_talks[self.nthTalk].rfind("DIVINED") == -1 ):
+            if "DIVINED" in self.agent_talks[self.nthTalk]:
                 pass # add to diviners
-            if not ( self.agent_talks[self.nthTalk].rfind("IDENTIFIED") == -1 ):
+            if "IDENTIFIED" in self.agent_talks[self.nthTalk]:
                 pass # add to likely mediums 
-            if not ( self.agent_talks[self.nthTalk].rfind("GUARDED") == -1 ):
+            if "GUARDED" in self.agent_talks[self.nthTalk]:
                 pass # add to likely bodyguard
-            if not ( self.agent_talks[self.nthTalk].rfind("BECAUSE") == -1 ):
+            if "BECAUSE" in self.agent_talks[self.nthTalk]:
                 pass
-            if not ( self.agent_talks[self.nthTalk].rfind("NOT") == -1 ):
+            if "NOT" in self.agent_talks[self.nthTalk]:
                 pass
-            if not ( self.agent_talks[self.nthTalk].rfind("AND") == -1 ):
+            if "AND" in self.agent_talks[self.nthTalk]:
                 pass
-            if not ( self.agent_talks[self.nthTalk].rfind("OR") == -1 ):
+            if "OR" in self.agent_talks[self.nthTalk]:
                 pass
-            if not ( self.agent_talks[self.nthTalk].rfind("XOR") == -1 ):
+            if "XOR" in self.agent_talks[self.nthTalk]:
                 pass
             self.nthTalk += 1
 

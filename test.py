@@ -33,3 +33,19 @@ g = [
 ]
 
 print(g)
+
+
+COs = {
+    '1':['seer',] ,
+    "2":[] ,
+
+}
+
+str = 'bruh'
+
+if 'uh' in str:
+    print('g')
+
+l = "{0:02d}".format(9)
+
+print(l)
