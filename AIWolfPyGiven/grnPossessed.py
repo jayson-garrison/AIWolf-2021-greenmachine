@@ -11,8 +11,11 @@ class Possessed(grnVillager.Villager):
         super().__init__(self, my_name)
         self.name = my_name
 
+    def initialize(self, base_info, diff_data, game_setting):
+        super().initialize(base_info, diff_data, game_setting)
+
     def update(self, base_info, diff_data, request):
-        pass
+        super().update(base_info, diff_data, request)
 
     def dayStart(self):
         pass

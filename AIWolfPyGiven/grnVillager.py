@@ -20,7 +20,7 @@ myname = 'greenmachine'
 class Villager(object):
     def __init__(self, agent_name):
         self.myname = agent_name # agent name 
-
+        self.idx = -1  # Our agent ID
         # initialize log 
         logging.basicConfig(filename=self.myname+".log",
                             level=logging.DEBUG,
@@ -32,6 +32,8 @@ class Villager(object):
 
     # new game (no return)
     def initialize(self, base_info, diff_data, game_setting):
+        if self.idx < 0:
+            self.idx = base_info['agentIdx']
         logging.debug("# INITIALIZE")
         logging.debug("Game Setting:")
         logging.debug(json.dumps(game_setting, indent=2))
@@ -54,11 +56,12 @@ class Villager(object):
         self.identified = dict() 
         #self.initialized_broadcasts = set()
         # when our own data is not needed
-        self.others = self.alive.copy().remove(self.base_info['agentIdx']) 
+        self.others = self.alive.copy() 
+        self.others.remove(self.idx)
         # all other players who tend to agree with me
         self.agreers = {player: 0 for player in self.others} 
         # ^^ but disagree
-        self.disagreers = {player: 0 for player in self.other} 
+        self.disagreers = {player: 0 for player in self.others} 
         self.dead = set()
         self.executed = set()
         # make sure executed + killed = dead
@@ -71,7 +74,7 @@ class Villager(object):
         # not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
         self.unknown = self.others.copy()
         # agents who request something of me
-        self.requesters = set() 
+        self.requesters = [] 
         # 2d list of agent talks of the day
         # format:
         # [ [0: turn, 1: agent, 2: text] ]
@@ -162,8 +165,8 @@ class Villager(object):
                     # consider else if an agent CO for another is significant
 
             if "ESTIMATE" in self.agent_talks[self.nthTalk]:
-                pass # add to estimators and assign roles accordingly
                 pass # add to requestors and evaluate if a reasonable request
+
             if "DIVINED" in self.agent_talks[self.nthTalk]:
                 # add to diviners
                 target = int(self.agent_talks[self.nthTalk][2][14:16])
@@ -224,8 +227,8 @@ class Villager(object):
             # if it is day 1, skip talking since there is no info, unless someone
             # requests us to CO, Vote, Agree, etc
             if self.base_info['myRole'] == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
-                return cb.skip()
-            return # talk 
+                return cb.comingout(self.idx, self.idx, 'VILLAGER')
+            return cb.over() # talk 
         else:
             return cb.over() # by default, ret over
 
