@@ -273,7 +273,7 @@ class Villager(object):
                         if self.seers[targ] > 0 and targ in self.alive:
                             return cb.logicalxor(self.idx, cb.estimate(self.idx, targ, "POSSESSED"), cb.estimate(self.idx, targ, "WEREWOLF"))
                 elif len(self.seers) == 1:
-                    return cb.estimate(self.idx, self.seers[self.seers.keys()[0]], "SEER")
+                    return cb.estimate(self.idx, next(iter(self.seers.values())), "SEER")
                 else:
                     return cb.skip()
 
