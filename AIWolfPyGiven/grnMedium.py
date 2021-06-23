@@ -25,7 +25,7 @@ class Medium(grnVillager.Villager):
                     self.to_report = (diff_data["agent"][i], diff_data["text"][i].split()[-1])
 
     def dayStart(self):
-        pass
+        super().dayStart()
 
     def talk(self):
         s = "Over"
