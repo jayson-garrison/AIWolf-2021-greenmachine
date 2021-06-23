@@ -88,9 +88,9 @@ class Villager(object):
         # format:
         # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
-        self.nthTalk = 0
+        self.nthTalk = -1
         self.estimate_votes = {player: [] for player in self.alive}
-        self.currentDay = 0
+        self.currentDay = -1
 
 
 
@@ -98,8 +98,8 @@ class Villager(object):
     # new information (no return)
     # add to lists (majority of the work)
     def update(self, base_info, diff_data, request):
-        #print('reached update') #
-        #print(self.agent_talks)
+        # print('reached update') #
+        print(self.agent_talks)
         logging.debug("# UPDATE")
         logging.debug("Request:")
         logging.debug(request)
@@ -116,10 +116,13 @@ class Villager(object):
 
         # if a new day. reset the talks, estimate votes
         if not (self.currentDay == int( self.base_info['day']) ):
+            print('reached reset')
+            self.nthTalk = -1
             self.agent_talks = []
             self.estimate_votes = {player: [] for player in self.alive}
 
         self.currentDay = int(self.base_info['day'])
+
         for row in diff_data.itertuples():
             type = getattr(row,"type")
             text = getattr(row,"text")
@@ -141,23 +144,17 @@ class Villager(object):
 
             # update the talk list
             if type == 'talk': # then gather the text
-                talkList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
-                self.agent_talks.append(talkList)
-
-                '''
-                turn = 
-                talker =  "{0:02d}".format( int(getattr(row, 'agent')) ) 
-                #rowCount = int( getattr(row, 'turn') )
-                talkString = str(talker) + ' ' + str(text)
-                #self.agent_talks[rowCount].append(talkString)
-                self.agent_talks.append(talkString)
-                '''
-
-        
+                if not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+                    talkList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
+                    self.agent_talks.append(talkList)
+                    print('type rist reached')
 
         # for new talks do:
         #endPos = len(self.agent_talks)
         while self.nthTalk < len(self.agent_talks):
+
+            self.nthTalk += 1
+            print('nth talk' + self.nthTalk)
 
             # agent 0
             if "VOTE" in self.agent_talks[self.nthTalk][2]:
@@ -169,31 +166,32 @@ class Villager(object):
                         self.estimate_votes[key_voted].remove(voter)
                 self.estimate_votes[voted].append(voter)
                     
-            if "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
+            elif "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
                 print('reached COs')
+                print(self.COs) #
                 who = self.agent_talks[self.nthTalk][1]
-                #print(who)
+                print(who)
                 subject = int( self.agent_talks[self.nthTalk][2][16:18] )
-                #print(subject)
+                print(subject)
                 if who == subject:
                     self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
                     # consider else if an agent CO for another is significant
-                if self.agent_talks[self.nthTalk][2][20:] == "SEER" and who not in self.seers:
-                    self.seers.add(self.agent_talks[self.nthTalk][1])
+                    if self.agent_talks[self.nthTalk][2][20:] == "SEER" and who not in self.seers:
+                        self.seers.add(self.agent_talks[self.nthTalk][1])
 
-                if self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
-                    self.mediums.add(self.agent_talks[self.nthTalk][1])
-                print(self.COs) #
-            if "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
-                pass # add to requestors and evaluate if a reasonable request
+                    elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
+                        self.mediums.add(self.agent_talks[self.nthTalk][1])
 
-            if "DIVINED" in self.agent_talks[self.nthTalk][2]:
+            #elif "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
+                #pass # add to requestors and evaluate if a reasonable request
+            
+            elif "DIVINED" in self.agent_talks[self.nthTalk][2]:
                 print('reached DIV')
                 # add to diviners
                 target = int(self.agent_talks[self.nthTalk][2][14:16])
                 species = self.agent_talks[self.nthTalk][2][18:]
                 if self.agent_talks[self.nthTalk][1] in self.divined: #not the first divine
-                    self.divined[self.agent_talks[self.nthTalk][1]].add([target, species])
+                    self.divined[self.agent_talks[self.nthTalk][1]].append([target, species])
                 else: #first divine
                     self.divined[self.agent_talks[self.nthTalk][1]] = [[target, species]]
 
@@ -202,7 +200,8 @@ class Villager(object):
                 elif species == "WEREWOLF":
                     self.seers[self.agent_talks[self.nthTalk][1]] += 1
                 print(self.divined) #
-            if "IDENTIFIED" in self.agent_talks[self.nthTalk][2]:
+
+            elif "IDENTIFIED" in self.agent_talks[self.nthTalk][2]:
                 # add to likely mediums 
                 target = int(self.agent_talks[self.nthTalk][2][17:19])
                 species = self.agent_talks[self.nthTalk][2][21:]
@@ -215,10 +214,13 @@ class Villager(object):
                 elif species == "WEREWOLF":
                     self.mediums[self.agent_talks[self.nthTalk][1]] += 1
                 
-            if "GUARDED" in self.agent_talks[self.nthTalk][2]:
+            elif "GUARDED" in self.agent_talks[self.nthTalk][2]:
                 # add to likely bodyguard
                 self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
+        
+            
 
+            '''
             # agent 0.5
             if "INQUIRE" in self.agent_talks[self.nthTalk][2]:
                 pass # add to estimators and assign roles accordingly
@@ -236,8 +238,7 @@ class Villager(object):
                 pass
             if "XOR" in self.agent_talks[self.nthTalk][2]:
                 pass
-            self.nthTalk += 1
-
+            '''
 
     # Start of the day (no return)
     def dayStart(self):
