@@ -32,4 +32,33 @@ g = [
 
 ]
 
-print(g)
+#print(g)
+
+
+COs = {
+    "1":[5,6,7,8] ,
+    "2":[7,8,3,5,2] ,
+    "3": [4,0,4,7,3]
+}
+
+for x in COs:
+    print(COs[x])
+
+
+if 0 in COs:
+    print('hh')
+
+'''
+str = 'bruh'
+
+if 'uh' in str:
+    print('g')
+
+l = "{0:02d}".format(9)
+
+print(l)
+
+
+s = 'hello'
+print(s[0:2])
+'''

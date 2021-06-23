@@ -66,7 +66,7 @@ class grnAgent(object):
                 self.role = Werewolf.Werewolf(self.myName)
             else:
                 self.role = Villager.Villager(self.myName)
-
+            self.role.initialize(base_info, diff_data, game_setting)
     # action functions, if an exception occurs, perform a standard action
     
     def update(self, base_info, diff_data, request):

@@ -20,7 +20,7 @@ myname = 'greenmachine'
 class Villager(object):
     def __init__(self, agent_name):
         self.myname = agent_name # agent name 
-
+        self.idx = -1  # Our agent ID
         # initialize log 
         logging.basicConfig(filename=self.myname+".log",
                             level=logging.DEBUG,
@@ -32,6 +32,15 @@ class Villager(object):
 
     # new game (no return)
     def initialize(self, base_info, diff_data, game_setting):
+        self.base_info = base_info
+        self.game_setting = game_setting
+
+        self.role = self.base_info['myRole']
+        if self.role == 'VILLAGER':
+            pass
+        if self.idx < 0:
+            self.idx = base_info['agentIdx']
+        
         logging.debug("# INITIALIZE")
         logging.debug("Game Setting:")
         logging.debug(json.dumps(game_setting, indent=2))
@@ -39,31 +48,47 @@ class Villager(object):
         logging.debug(json.dumps(base_info, indent=2))
         logging.debug("Diff Data:")
         logging.debug(diff_data)
-        self.base_info = base_info
-        self.game_setting = game_setting
+
+        self.hasCO = False
         # print(base_info)
         # print(diff_data)
         self.alive = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
-        self.COs = {player: "" for player in self.alive} #our own COs would be self.COs[self.base_info['agentIdx']]
-        self.votedme = set() #players who voted for me
-        self.divined_broadcasts = set()
-        self.initialized_broadcasts = set()
-        self.others = self.alive.copy().remove(self.base_info['agentIdx']) #when our own data is not needed
-        self.agreers = {player: 0 for player in self.others} #all other players who tend to agree with me
-        self.disagreers = {player: 0 for player in self.other} #^^ but disagree
+        # our own COs would be self.COs[self.base_info['agentIdx']]
+        self.COs = {player: set() for player in self.alive} 
+        # players who voted for me
+        self.votedme = set() 
+        #everyone who said they divined someone, paired with who they divined
+        self.divined = dict() 
+        #everyone who said they identified someone, paired with who they identified
+        self.identified = dict() 
+        #self.initialized_broadcasts = set()
+        # when our own data is not needed
+        self.others = self.alive.copy() 
+        self.others.remove(self.idx)
+        # all other players who tend to agree with me
+        self.agreers = {player: 0 for player in self.others} 
+        # ^^ but disagree
+        self.disagreers = {player: 0 for player in self.others} 
         self.dead = set()
         self.executed = set()
-        self.killed = set() #make sure executed + killed = dead
+        # make sure executed + killed = dead
+        self.killed = set() 
+        self.seers = set()
+        self.mediums = set()
+        self.bodyguards = set()
         self.likely_human = set()
         self.likely_werewolf = set()
-        self.unknown = self.others.copy() #not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
-        self.requesters = set() #agens who request something of me
-        # an empty list that will be used as a 2d array of strings to track agent talks.
-        # it resets everyday and is filled in the update fx when server requests the talk fx
-        # contents take the form: "[who] [text]" where the row is the turn and the col is the
-        # text.
+        # not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
+        self.unknown = self.others.copy()
+        # agents who request something of me
+        self.requesters = [] 
+        # 2d list of agent talks of the day
+        # format:
+        # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
-        #self.rowCount = 0
+        self.nthTalk = 0
+        self.estimate_votes = {player: [] for player in self.alive}
+        self.currentDay = 0
 
 
 
@@ -84,7 +109,13 @@ class Villager(object):
         # print(diff_data)
 
         # scan diff_data for different info based on type
-        currentDay = int(self.base_info['day'])
+
+        # if a new day. reset the talks, estimate votes
+        if not (self.currentDay == int( self.base_info['day']) ):
+            self.agent_talks = []
+            self.estimate_votes = {player: [] for player in self.alive}
+
+        self.currentDay = int(self.base_info['day'])
         for row in diff_data.itertuples():
             type = getattr(row,"type")
             text = getattr(row,"text")
@@ -105,17 +136,86 @@ class Villager(object):
 
             # update the talk list
             if type == 'talk': # then gather the text
-                talker = getattr(row, 'agent')
-                rowCount = int( getattr(row, 'turn') )
-                talkString = str(talker) + text
-                self.agent_talks[rowCount].append(talkString)
+                talkList = [int(getattr(row, 'turn')), "{0:02d}".format( int(getattr(row, 'agent')) ), str(text) ]
+                self.agent_talks.append(talkList)
+
+                '''
+                turn = 
+                talker =  "{0:02d}".format( int(getattr(row, 'agent')) ) 
+                #rowCount = int( getattr(row, 'turn') )
+                talkString = str(talker) + ' ' + str(text)
+                #self.agent_talks[rowCount].append(talkString)
+                self.agent_talks.append(talkString)
+                '''
+
+        
+
+        # for new talks do:
+        #endPos = len(self.agent_talks)
+        while self.nthTalk < len(self.agent_talks):
+
+            # agent 0
+            if "VOTE" in self.agent_talks[self.nthTalk]:
                 
-        # if a new day. reset the talks
-        if not (currentDay == int( self.base_info['day']) ):
-            self.agent_talks = []
+                voter = self.agent_talks[self.nthTalk][1]
+                voted = int( self.agent_talks[self.nthTalk][2][11:13] )
+                for key_voted in self.estimate_votes:
+                    if voter in self.estimate_votes[key_voted]:
+                        self.estimate_votes[key_voted].remove(voter)
+                self.estimate_votes[voted].append(voter)
+                    
+            if "COMINGOUT" in self.agent_talks[self.nthTalk]:
+                who = self.agent_talks[self.nthTalk][1]
+                subject = int( self.agent_talks[self.nthTalk][2][17:19] )
+                if who == subject:
+                    self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
+                    # consider else if an agent CO for another is significant
 
+            if "ESTIMATE" in self.agent_talks[self.nthTalk]:
+                pass # add to requestors and evaluate if a reasonable request
 
+            if "DIVINED" in self.agent_talks[self.nthTalk]:
+                # add to diviners
+                target = int(self.agent_talks[self.nthTalk][2][14:16])
+                species = self.agent_talks[self.nthTalk][2][19:]
+                if self.agent_talks[self.nthTalk][1] in self.divined: #not the first divine
+                    self.divined[self.agent_talks[self.nthTalk][1]].add([target, species])
+                else: #first divine
+                    self.divined[self.agent_talks[self.nthTalk][1]] = [[target, species]]
+                if self.agent_talks[self.nthTalk][1] not in self.seers: self.seers.add(self.agent_talks[self.nthTalk][1])
 
+            if "IDENTIFIED" in self.agent_talks[self.nthTalk]:
+                # add to likely mediums 
+                target = int(self.agent_talks[self.nthTalk][2][17:19])
+                species = self.agent_talks[self.nthTalk][2][22:]
+                if self.agent_talks[self.nthTalk][1] in self.identified: #not the first divine
+                    self.identified[self.agent_talks[self.nthTalk][1]].add([target, species])
+                else: #first divine
+                    self.identified[self.agent_talks[self.nthTalk][1]] = [[target, species]]
+                if self.agent_talks[self.nthTalk][1] not in self.mediums: self.mediums.add(self.agent_talks[self.nthTalk][1])
+                
+            if "GUARDED" in self.agent_talks[self.nthTalk]:
+                # add to likely bodyguard
+                self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
+
+            # agent 0.5
+            if "INQUIRE" in self.agent_talks[self.nthTalk]:
+                pass # add to estimators and assign roles accordingly
+            if "REQUEST" in self.agent_talks[self.nthTalk]:
+                pass
+
+            # agent 1
+            if "BECAUSE" in self.agent_talks[self.nthTalk]:
+                pass
+            if "NOT" in self.agent_talks[self.nthTalk]:
+                pass
+            if "AND" in self.agent_talks[self.nthTalk]:
+                pass
+            if "OR" in self.agent_talks[self.nthTalk]:
+                pass
+            if "XOR" in self.agent_talks[self.nthTalk]:
+                pass
+            self.nthTalk += 1
 
 
     # Start of the day (no return)
@@ -133,9 +233,10 @@ class Villager(object):
             self.talkTurn += 1
             # if it is day 1, skip talking since there is no info, unless someone
             # requests us to CO, Vote, Agree, etc
-            if self.base_info['myRole'] == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
-                return cb.skip()
-            return # talk 
+            if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
+                self.hasCO = True
+                return cb.comingout(self.idx, self.idx, 'VILLAGER')
+            return cb.over() # talk 
         else:
             return cb.over() # by default, ret over
 

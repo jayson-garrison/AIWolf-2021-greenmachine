@@ -1,27 +1,33 @@
 """
-    Contains Body Guard Class
-    James Hale
+    Contains Seer Class
+    Jayson C. Garrison
 """
+import aiwolfpy
+from aiwolfpy import contentbuilder as cb
+import grnVillager
 
-
-class Seer(object):
+class Seer(grnVillager.Villager):
     def __init__(self, my_name):
-        self.name = my_name
+        super().__init__(my_name)
+
+    def initialize(self, base_info, diff_data, game_setting):
+        super().initialize(base_info, diff_data, game_setting)
 
     def update(self, base_info, diff_data, request):
-        pass
+        super().update(base_info, diff_data, request)
 
     def dayStart(self):
-        pass
+        super().dayStart()
+        return None
 
     def talk(self):
-        return "Over"
+        super().talk()
 
     def vote(self):
-        return 1
+        super().vote()
 
     def divine(self):
-        pass
+        return 1
 
     def guard(self):
         return 1
@@ -33,4 +39,4 @@ class Seer(object):
         pass
 
     def finish(self):
-        pass
+        super().finish(self)

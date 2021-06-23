@@ -1,36 +1,32 @@
 """
-    Contains Body Guard Class
+    Contains Posessed Class
     James Hale
+    Grey Bodi
 """
+import aiwolfpy
+from aiwolfpy import contentbuilder as cb
+import grnVillager
 
-
-class Possessed(object):
+class Possessed(grnVillager.Villager):
     def __init__(self, my_name):
+        super().__init__(my_name)
         self.name = my_name
 
+    def initialize(self, base_info, diff_data, game_setting):
+        super().initialize(base_info, diff_data, game_setting)
+
     def update(self, base_info, diff_data, request):
-        pass
+        super().update(base_info, diff_data, request)
 
     def dayStart(self):
-        pass
+        super().dayStart()
 
     def talk(self):
-        return "Over"
+        super().talk()
 
     def vote(self):
         return 1
 
-    def divine(self):
-        pass
-
-    def guard(self):
-        return 1
-
-    def whisper(self):
-        return "Over"
-
-    def attack(self):
-        pass
 
     def finish(self):
-        pass
+        super().finish()
