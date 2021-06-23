@@ -1,6 +1,9 @@
 """
     Contains Medium Class
     James Hale
+    Proportion of times werewolves attack who they vote for
+    Voting compared with kill choice (Do the werewolves act stupid?)
+    Trust reduction for people who voted for me
 """
 
 from aiwolfpy import contentbuilder as cb
@@ -25,7 +28,7 @@ class Medium(object):
         pass
 
     def talk(self):
-        s = "Over"
+        s = cb.over()
         if self.to_report is not None:
             if not self.hasComeOut:
                 self.hasComeOut = True
@@ -45,7 +48,7 @@ class Medium(object):
         return 1
 
     def whisper(self):
-        return "Over"
+        return cb.over()
 
     def attack(self):
         pass
