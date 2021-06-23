@@ -14,6 +14,7 @@ from __future__ import print_function, division
 import aiwolfpy
 from aiwolfpy import contentbuilder as cb
 import logging, json
+import random
 
 myname = 'greenmachine'
 
@@ -36,8 +37,9 @@ class Villager(object):
         self.game_setting = game_setting
 
         self.role = self.base_info['myRole']
-        if self.role == 'VILLAGER':
-            pass
+        
+        self.behavior = random.randint(1,100)
+
         if self.idx < 0:
             self.idx = base_info['agentIdx']
         
@@ -73,8 +75,8 @@ class Villager(object):
         self.executed = set()
         # make sure executed + killed = dead
         self.killed = set() 
-        self.seers = set()
-        self.mediums = set()
+        self.seers = dict()
+        self.mediums = dict()
         self.bodyguards = set()
         self.likely_human = set()
         self.likely_werewolf = set()
@@ -170,6 +172,11 @@ class Villager(object):
                 if who == subject:
                     self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
                     # consider else if an agent CO for another is significant
+                if self.agent_talks[self.nthTalk][2][20:] == "SEER" and who not in self.seers:
+                    self.seers.add(self.agent_talks[self.nthTalk][1])
+
+                if self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
+                    self.mediums.add(self.agent_talks[self.nthTalk][1])
 
             if "ESTIMATE" in self.agent_talks[self.nthTalk]:
                 pass # add to requestors and evaluate if a reasonable request
@@ -182,7 +189,11 @@ class Villager(object):
                     self.divined[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
                     self.divined[self.agent_talks[self.nthTalk][1]] = [[target, species]]
-                if self.agent_talks[self.nthTalk][1] not in self.seers: self.seers.add(self.agent_talks[self.nthTalk][1])
+
+                if self.agent_talks[self.nthTalk][1] not in self.seers:
+                    self.seers[self.agent_talks[self.nthTalk][1]] = 0
+                elif species == "WEREWOLF":
+                    self.seers[self.agent_talks[self.nthTalk][1]] += 1
 
             if "IDENTIFIED" in self.agent_talks[self.nthTalk]:
                 # add to likely mediums 
@@ -192,7 +203,10 @@ class Villager(object):
                     self.identified[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
                     self.identified[self.agent_talks[self.nthTalk][1]] = [[target, species]]
-                if self.agent_talks[self.nthTalk][1] not in self.mediums: self.mediums.add(self.agent_talks[self.nthTalk][1])
+                if self.agent_talks[self.nthTalk][1] not in self.mediums:
+                    self.mediums[self.agent_talks[self.nthTalk][1]] = 0
+                elif species == "WEREWOLF":
+                    self.mediums[self.agent_talks[self.nthTalk][1]] += 1
                 
             if "GUARDED" in self.agent_talks[self.nthTalk]:
                 # add to likely bodyguard
@@ -233,9 +247,29 @@ class Villager(object):
             self.talkTurn += 1
             # if it is day 1, skip talking since there is no info, unless someone
             # requests us to CO, Vote, Agree, etc
-            if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
-                self.hasCO = True
-                return cb.comingout(self.idx, self.idx, 'VILLAGER')
+            if int(self.base_info['day']) == 1:
+                if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
+                    self.hasCO = True
+                    return cb.comingout(self.idx, self.idx, 'VILLAGER')
+                elif self.talkTurn < 4:
+                    if len(self.seers) > 1:
+                        for targ in self.seers:
+                            if self.seers[targ] > 0:
+                                return cb.vote(self.idx, targ)
+                    else:
+                        cb.skip()
+                        
+                else: return cb.over()
+            if int(self.base_info['day']) == 2:
+                if len(self.seers) > 1:
+                    for targ in self.seers:
+                        if self.seers[targ] > 0 and targ in self.alive:
+                            return cb.logicalxor(self.idx, cb.estimate(self.idx, targ, "POSSESSED"), cb.estimate(self.idx, targ, "WEREWOLF"))
+                elif len(self.seers) == 1:
+                    return cb.estimate(self.idx, self.seers[self.seers.keys()[0]], "SEER")
+                else:
+                    return cb.skip()
+
             return cb.over() # talk 
         else:
             return cb.over() # by default, ret over

@@ -26,6 +26,7 @@ print(list)
 list.append([5,3])
 print(list)
 '''
+import random
 
 g = [
 [1,2,3,4]
@@ -62,3 +63,4 @@ print(l)
 s = 'hello'
 print(s[0:2])
 '''
+print(random.randint(0,1))
