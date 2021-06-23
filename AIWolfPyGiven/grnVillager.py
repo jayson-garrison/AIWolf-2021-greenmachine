@@ -99,7 +99,7 @@ class Villager(object):
     # add to lists (majority of the work)
     def update(self, base_info, diff_data, request):
         #print('reached update') #
-        print(self.agent_talks)
+        #print(self.agent_talks)
         logging.debug("# UPDATE")
         logging.debug("Request:")
         logging.debug(request)
@@ -172,17 +172,17 @@ class Villager(object):
             if "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
                 print('reached COs')
                 who = self.agent_talks[self.nthTalk][1]
-                print(who)
+                #print(who)
                 subject = int( self.agent_talks[self.nthTalk][2][16:18] )
-                print(subject)
+                #print(subject)
                 if who == subject:
                     self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
                     # consider else if an agent CO for another is significant
-                    if self.agent_talks[self.nthTalk][2][20:] == "SEER" and who not in self.seers:
-                        self.seers.add(self.agent_talks[self.nthTalk][1])
+                if self.agent_talks[self.nthTalk][2][20:] == "SEER" and who not in self.seers:
+                    self.seers.add(self.agent_talks[self.nthTalk][1])
 
-                    if self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
-                        self.mediums.add(self.agent_talks[self.nthTalk][1])
+                if self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
+                    self.mediums.add(self.agent_talks[self.nthTalk][1])
                 print(self.COs) #
             if "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
                 pass # add to requestors and evaluate if a reasonable request
@@ -193,7 +193,7 @@ class Villager(object):
                 target = int(self.agent_talks[self.nthTalk][2][14:16])
                 species = self.agent_talks[self.nthTalk][2][18:]
                 if self.agent_talks[self.nthTalk][1] in self.divined: #not the first divine
-                    self.divined[self.agent_talks[self.nthTalk][1]].append([target, species])
+                    self.divined[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
                     self.divined[self.agent_talks[self.nthTalk][1]] = [[target, species]]
 
