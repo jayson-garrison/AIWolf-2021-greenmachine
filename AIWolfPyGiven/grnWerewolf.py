@@ -2,11 +2,16 @@
     Contains Werewolf Class
     James Hale
 """
+import aiwolfpy
+from aiwolfpy import contentbuilder as cb
+import grnVillager
 
-
-class Werewolf(object):
+class Werewolf(grnVillager.Villager):
     def __init__(self, my_name):
         self.name = my_name
+
+    def initialize(self, base_info, diff_data, game_setting):
+        super().initialize(base_info, diff_data, game_setting)
 
     def update(self, base_info, diff_data, request):
         pass
