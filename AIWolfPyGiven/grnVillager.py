@@ -154,21 +154,23 @@ class Villager(object):
                 pass # add to requestors and evaluate if a reasonable request
             if "DIVINED" in self.agent_talks[self.nthTalk]:
                 # add to diviners
-                target = int(self.agent_talks[2][14,16])
-                if self.agent_talks[1] in self.divined: #not the first divine
-                    self.divined[self.agent_talks[1]].add(target)
+                target = int(self.agent_talks[self.nthTalk][2][14:16])
+                species = self.agent_talks[self.nthTalk][2][19:]
+                if self.agent_talks[self.nthTalk][1] in self.divined: #not the first divine
+                    self.divined[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
-                    self.divined[self.agent_talks[1]] = [target]
-                if self.agent_talks[1] not in self.seers: self.seers.add(self.agent_talks[1])
+                    self.divined[self.agent_talks[self.nthTalk][1]] = [[target, species]]
+                if self.agent_talks[self.nthTalk][1] not in self.seers: self.seers.add(self.agent_talks[self.nthTalk][1])
 
             if "IDENTIFIED" in self.agent_talks[self.nthTalk]:
                 # add to likely mediums 
-                target = int(self.agent_talks[2][14,16])
-                if self.agent_talks[1] in self.divined: #not the first divine
-                    self.divined[self.agent_talks[1]].add(target)
+                target = int(self.agent_talks[self.nthTalk][2][17:19])
+                species = self.agent_talks[self.nthTalk][2][22:]
+                if self.agent_talks[self.nthTalk][1] in self.identified: #not the first divine
+                    self.identified[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
-                    self.divined[self.agent_talks[1]] = [target]
-                if self.agent_talks[1] not in self.seers: self.seers.add(self.agent_talks[1])
+                    self.identified[self.agent_talks[self.nthTalk][1]] = [[target, species]]
+                if self.agent_talks[self.nthTalk][1] not in self.mediums: self.mediums.add(self.agent_talks[self.nthTalk][1])
                 
             if "GUARDED" in self.agent_talks[self.nthTalk]:
                 pass # add to likely bodyguard
