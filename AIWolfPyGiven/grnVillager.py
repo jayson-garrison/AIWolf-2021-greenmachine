@@ -177,12 +177,14 @@ class Villager(object):
                     self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
                     # consider else if an agent CO for another is significant
                     if self.agent_talks[self.nthTalk][2][20:] == "SEER" and not (who in self.seers):
-                        self.seers.add(self.agent_talks[self.nthTalk][1])
+                        #self.seers.add(self.agent_talks[self.nthTalk][1])
+                        self.seers[self.agent_talks[self.nthTalk][1]] = 0
 
                     elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and not (who in self.mediums):
-                        self.mediums.add(self.agent_talks[self.nthTalk][1])
+                        #self.mediums.add(self.agent_talks[self.nthTalk][1])
+                        self.seers[self.agent_talks[self.nthTalk][1]] = 0
                     print(self.COs) #
-                    
+
             #elif "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
                 #pass # add to requestors and evaluate if a reasonable request
             
