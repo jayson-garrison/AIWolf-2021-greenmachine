@@ -91,6 +91,9 @@ class Villager(object):
         self.nthTalk = -1
         self.estimate_votes = {player: [] for player in self.alive}
         self.currentDay = -1
+        self.repeatTalk = False
+        self.unaccused = self.alive.copy()
+        self.will_vote = []
 
 
 
@@ -120,6 +123,8 @@ class Villager(object):
             self.nthTalk = -1
             self.agent_talks = []
             self.estimate_votes = {player: [] for player in self.alive}
+            self.repeatTalk = False
+            self.unaccused = self.alive.copy()
 
         self.currentDay = int(self.base_info['day'])
 
@@ -256,9 +261,10 @@ class Villager(object):
         logging.debug("# TALK") # not sure where we need to put this 
         if self.talkTurn < 10: # max of 10 talks 
             self.talkTurn += 1
-            # if it is day 1, skip talking since there is no info, unless someone
-            # requests us to CO, Vote, Agree, etc
+
+            # day 1 voting logic
             if int(self.base_info['day']) == 1:
+                # 30% CO Villager
                 if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
                     self.hasCO = True
                     return cb.comingout(self.idx, self.idx, 'VILLAGER')
@@ -269,14 +275,19 @@ class Villager(object):
                                 return cb.vote(self.idx, targ)
                     else:
                         cb.skip()
-                        
                 else: return cb.over()
+
             if int(self.base_info['day']) == 2:
                 if len(self.seers) > 1:
                     for targ in self.seers:
-                        if self.seers[targ] > 0 and targ in self.alive:
+                        if self.seers[targ] > 0 and targ in self.unaccused:
+                            self.unaccused.remove(targ)
+                            self.likely_werewolf.add(targ)
+                            self.will_vote.append(targ)
                             return cb.logicalxor(self.idx, cb.estimate(self.idx, targ, "POSSESSED"), cb.estimate(self.idx, targ, "WEREWOLF"))
-                elif len(self.seers) == 1:
+                elif len(self.seers) == 1 and next(iter(self.seers.values())) in self.unaccused:
+                    self.unaccused.remove(next(iter(self.seers.values())))
+                    self.likely_human.add(next(iter(self.seers.values())))
                     return cb.estimate(self.idx, next(iter(self.seers.values())), "SEER")
                 else:
                     return cb.skip()
@@ -289,6 +300,10 @@ class Villager(object):
     # agent as the return
     # act based on the lists
     def vote(self):
+        if self.currentDay == 1:
+            return -1
+        if self.currentDay == 2:
+            return self.will_vote[0]
         logging.debug("# VOTE")
         for targ in self.COs:
             if "WEREWOLF" in self.COs[targ]:
