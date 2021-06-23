@@ -303,7 +303,7 @@ class Villager(object):
         if self.currentDay == 1:
             return -1
         if self.currentDay == 2:
-            return self.will_vote[0]
+            return next(iter(self.likely_werewolf))
         logging.debug("# VOTE")
         for targ in self.COs:
             if "WEREWOLF" in self.COs[targ]:
