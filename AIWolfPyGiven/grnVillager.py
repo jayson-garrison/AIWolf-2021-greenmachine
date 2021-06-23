@@ -98,6 +98,8 @@ class Villager(object):
     # new information (no return)
     # add to lists (majority of the work)
     def update(self, base_info, diff_data, request):
+        #print('reached update') #
+        #print(self.agent_talks)
         logging.debug("# UPDATE")
         logging.debug("Request:")
         logging.debug(request)
@@ -121,7 +123,8 @@ class Villager(object):
         for row in diff_data.itertuples():
             type = getattr(row,"type")
             text = getattr(row,"text")
-            
+            # print('reached for')
+            # print(self.COs) #
             # update executed players
             if type == 'execute':
                 self.executed.add( int(getattr(row, 'agent')) )
@@ -138,7 +141,7 @@ class Villager(object):
 
             # update the talk list
             if type == 'talk': # then gather the text
-                talkList = [int(getattr(row, 'turn')), "{0:02d}".format( int(getattr(row, 'agent')) ), str(text) ]
+                talkList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
                 self.agent_talks.append(talkList)
 
                 '''
@@ -157,7 +160,7 @@ class Villager(object):
         while self.nthTalk < len(self.agent_talks):
 
             # agent 0
-            if "VOTE" in self.agent_talks[self.nthTalk]:
+            if "VOTE" in self.agent_talks[self.nthTalk][2]:
                 
                 voter = self.agent_talks[self.nthTalk][1]
                 voted = int( self.agent_talks[self.nthTalk][2][11:13] )
@@ -166,9 +169,12 @@ class Villager(object):
                         self.estimate_votes[key_voted].remove(voter)
                 self.estimate_votes[voted].append(voter)
                     
-            if "COMINGOUT" in self.agent_talks[self.nthTalk]:
+            if "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
+                print('reached COs')
                 who = self.agent_talks[self.nthTalk][1]
-                subject = int( self.agent_talks[self.nthTalk][2][17:19] )
+                print(who)
+                subject = int( self.agent_talks[self.nthTalk][2][16:18] )
+                print(subject)
                 if who == subject:
                     self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
                     # consider else if an agent CO for another is significant
@@ -177,14 +183,15 @@ class Villager(object):
 
                 if self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
                     self.mediums.add(self.agent_talks[self.nthTalk][1])
-
-            if "ESTIMATE" in self.agent_talks[self.nthTalk]:
+                print(self.COs) #
+            if "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
                 pass # add to requestors and evaluate if a reasonable request
 
-            if "DIVINED" in self.agent_talks[self.nthTalk]:
+            if "DIVINED" in self.agent_talks[self.nthTalk][2]:
+                print('reached DIV')
                 # add to diviners
                 target = int(self.agent_talks[self.nthTalk][2][14:16])
-                species = self.agent_talks[self.nthTalk][2][19:]
+                species = self.agent_talks[self.nthTalk][2][18:]
                 if self.agent_talks[self.nthTalk][1] in self.divined: #not the first divine
                     self.divined[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
@@ -194,11 +201,11 @@ class Villager(object):
                     self.seers[self.agent_talks[self.nthTalk][1]] = 0
                 elif species == "WEREWOLF":
                     self.seers[self.agent_talks[self.nthTalk][1]] += 1
-
-            if "IDENTIFIED" in self.agent_talks[self.nthTalk]:
+                print(self.divined) #
+            if "IDENTIFIED" in self.agent_talks[self.nthTalk][2]:
                 # add to likely mediums 
                 target = int(self.agent_talks[self.nthTalk][2][17:19])
-                species = self.agent_talks[self.nthTalk][2][22:]
+                species = self.agent_talks[self.nthTalk][2][21:]
                 if self.agent_talks[self.nthTalk][1] in self.identified: #not the first divine
                     self.identified[self.agent_talks[self.nthTalk][1]].add([target, species])
                 else: #first divine
@@ -208,26 +215,26 @@ class Villager(object):
                 elif species == "WEREWOLF":
                     self.mediums[self.agent_talks[self.nthTalk][1]] += 1
                 
-            if "GUARDED" in self.agent_talks[self.nthTalk]:
+            if "GUARDED" in self.agent_talks[self.nthTalk][2]:
                 # add to likely bodyguard
                 self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
 
             # agent 0.5
-            if "INQUIRE" in self.agent_talks[self.nthTalk]:
+            if "INQUIRE" in self.agent_talks[self.nthTalk][2]:
                 pass # add to estimators and assign roles accordingly
-            if "REQUEST" in self.agent_talks[self.nthTalk]:
+            if "REQUEST" in self.agent_talks[self.nthTalk][2]:
                 pass
 
             # agent 1
-            if "BECAUSE" in self.agent_talks[self.nthTalk]:
+            if "BECAUSE" in self.agent_talks[self.nthTalk][2]:
                 pass
-            if "NOT" in self.agent_talks[self.nthTalk]:
+            if "NOT" in self.agent_talks[self.nthTalk][2]:
                 pass
-            if "AND" in self.agent_talks[self.nthTalk]:
+            if "AND" in self.agent_talks[self.nthTalk][2]:
                 pass
-            if "OR" in self.agent_talks[self.nthTalk]:
+            if "OR" in self.agent_talks[self.nthTalk][2]:
                 pass
-            if "XOR" in self.agent_talks[self.nthTalk]:
+            if "XOR" in self.agent_talks[self.nthTalk][2]:
                 pass
             self.nthTalk += 1
 
