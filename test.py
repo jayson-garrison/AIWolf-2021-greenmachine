@@ -28,9 +28,12 @@ print(list)
 '''
 
 g = [
-[1,2,3,4]
-
+[1,2,3,4],
+[7,3,2]
 ]
+
+if [7,3,2] in g:
+    print('passed')
 
 #print(g)
 
@@ -41,10 +44,14 @@ COs = {
     "3": [4,0,4,7,3]
 }
 
+<<<<<<< HEAD
 for x in COs:
     print(COs[x])
 
 if 0 in COs:
+=======
+if "1" in COs:
+>>>>>>> main
     print('hh')
 
 '''
