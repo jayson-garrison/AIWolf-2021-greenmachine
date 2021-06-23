@@ -44,15 +44,6 @@ COs = {
     "3": [4,0,4,7,3]
 }
 
-<<<<<<< HEAD
-for x in COs:
-    print(COs[x])
-
-if 0 in COs:
-=======
-if "1" in COs:
->>>>>>> main
-    print('hh')
 
 '''
 str = 'bruh'
