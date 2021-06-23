@@ -44,27 +44,36 @@ class Villager(object):
         # print(base_info)
         # print(diff_data)
         self.alive = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
-        self.COs = {player: [] for player in self.alive} # our own COs would be self.COs[self.base_info['agentIdx']]
-        self.votedme = set() # players who voted for me
-        self.divined = dict() #everyone who said they divined someone, paired with who they divined
-        self.identified = dict() #everyone who said they identified someone, paired with who they identified
+        # our own COs would be self.COs[self.base_info['agentIdx']]
+        self.COs = {player: set() for player in self.alive} 
+        # players who voted for me
+        self.votedme = set() 
+        #everyone who said they divined someone, paired with who they divined
+        self.divined = dict() 
+        #everyone who said they identified someone, paired with who they identified
+        self.identified = dict() 
         #self.initialized_broadcasts = set()
-        self.others = self.alive.copy().remove(self.base_info['agentIdx']) # when our own data is not needed
-        self.agreers = {player: 0 for player in self.others} # all other players who tend to agree with me
-        self.disagreers = {player: 0 for player in self.other} # ^^ but disagree
+        # when our own data is not needed
+        self.others = self.alive.copy().remove(self.base_info['agentIdx']) 
+        # all other players who tend to agree with me
+        self.agreers = {player: 0 for player in self.others} 
+        # ^^ but disagree
+        self.disagreers = {player: 0 for player in self.other} 
         self.dead = set()
         self.executed = set()
-        self.killed = set() # make sure executed + killed = dead
+        # make sure executed + killed = dead
+        self.killed = set() 
         self.seers = set()
         self.mediums = set()
         self.likely_human = set()
         self.likely_werewolf = set()
-        self.unknown = self.others.copy() # not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
-        self.requesters = set() #agens who request something of me
-        # an empty list that will be used as a 2d array of strings to track agent talks.
-        # it resets everyday and is filled in the update fx when server requests the talk fx
-        # contents take the form: "[who] [text]" where the row is the turn and the col is the
-        # text.
+        # not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
+        self.unknown = self.others.copy()
+        # agents who request something of me
+        self.requesters = set() 
+        # 2d list of agent talks of the day
+        # format:
+        # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
         self.nthTalk = 0
         self.estimate_votes = {player: [] for player in self.alive}
@@ -138,17 +147,19 @@ class Villager(object):
             if "VOTE" in self.agent_talks[self.nthTalk]:
                 
                 voter = self.agent_talks[self.nthTalk][1]
-                voted = self.agent_talks[self.nthTalk][2][11:13]
-                if '0' in voted:
-                    voted.replace('0', '')
-                if voter not in self.estimate_votes:
-                    self.estimate_votes[voted].append(voter)
-                else:
-                    self.estimate_votes[voted].remove(voter)
-                    self.estimate_votes[voted].append(voter)
+                voted = int( self.agent_talks[self.nthTalk][2][11:13] )
+                for key_voted in self.estimate_votes:
+                    if voter in self.estimate_votes[key_voted]:
+                        self.estimate_votes[key_voted].remove(voter)
+                self.estimate_votes[voted].append(voter)
                     
             if "COMINGOUT" in self.agent_talks[self.nthTalk]:
-                pass # add to COs
+                who = self.agent_talks[self.nthTalk][1]
+                subject = int( self.agent_talks[self.nthTalk][2][17:19] )
+                if who == subject:
+                    self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
+                    # consider else if an agent CO for another is significant
+
             if "ESTIMATE" in self.agent_talks[self.nthTalk]:
                 pass # add to estimators and assign roles accordingly
                 pass # add to requestors and evaluate if a reasonable request
@@ -157,7 +168,7 @@ class Villager(object):
                 target = int(self.agent_talks[2][14,16])
                 if self.agent_talks[1] in self.divined: #not the first divine
                     self.divined[self.agent_talks[1]].add(target)
-                else: #first divine
+                else: # first divine
                     self.divined[self.agent_talks[1]] = [target]
                 if self.agent_talks[1] not in self.seers: self.seers.add(self.agent_talks[1])
 
@@ -166,7 +177,7 @@ class Villager(object):
                 target = int(self.agent_talks[2][14,16])
                 if self.agent_talks[1] in self.divined: #not the first divine
                     self.divined[self.agent_talks[1]].add(target)
-                else: #first divine
+                else: # first divine
                     self.divined[self.agent_talks[1]] = [target]
                 if self.agent_talks[1] not in self.seers: self.seers.add(self.agent_talks[1])
                 
