@@ -65,6 +65,7 @@ class Villager(object):
         self.killed = set() 
         self.seers = set()
         self.mediums = set()
+        self.bodyguards = set()
         self.likely_human = set()
         self.likely_werewolf = set()
         # not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
@@ -184,7 +185,8 @@ class Villager(object):
                 if self.agent_talks[self.nthTalk][1] not in self.mediums: self.mediums.add(self.agent_talks[self.nthTalk][1])
                 
             if "GUARDED" in self.agent_talks[self.nthTalk]:
-                pass # add to likely bodyguard
+                # add to likely bodyguard
+                self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
 
             # agent 0.5
             if "INQUIRE" in self.agent_talks[self.nthTalk]:
