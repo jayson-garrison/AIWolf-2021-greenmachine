@@ -32,8 +32,15 @@ class Villager(object):
 
     # new game (no return)
     def initialize(self, base_info, diff_data, game_setting):
+        self.base_info = base_info
+        self.game_setting = game_setting
+
+        self.role = self.base_info['myRole']
+        if self.role == 'VILLAGER':
+            pass
         if self.idx < 0:
             self.idx = base_info['agentIdx']
+        
         logging.debug("# INITIALIZE")
         logging.debug("Game Setting:")
         logging.debug(json.dumps(game_setting, indent=2))
@@ -41,8 +48,8 @@ class Villager(object):
         logging.debug(json.dumps(base_info, indent=2))
         logging.debug("Diff Data:")
         logging.debug(diff_data)
-        self.base_info = base_info
-        self.game_setting = game_setting
+
+        self.hasCO = False
         # print(base_info)
         # print(diff_data)
         self.alive = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15}
@@ -226,7 +233,8 @@ class Villager(object):
             self.talkTurn += 1
             # if it is day 1, skip talking since there is no info, unless someone
             # requests us to CO, Vote, Agree, etc
-            if self.base_info['myRole'] == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
+            if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and int(self.base_info['day']) == 1:
+                self.hasCO = True
                 return cb.comingout(self.idx, self.idx, 'VILLAGER')
             return cb.over() # talk 
         else:
