@@ -151,10 +151,10 @@ class Villager(object):
 
         # for new talks do:
         #endPos = len(self.agent_talks)
-        while self.nthTalk < len(self.agent_talks):
+        while self.nthTalk < len(self.agent_talks) and not len(self.agent_talks) == 0:
 
             self.nthTalk += 1
-            print('nth talk' + self.nthTalk)
+            print( 'nth talk' + str(self.nthTalk) )
 
             # agent 0
             if "VOTE" in self.agent_talks[self.nthTalk][2]:
@@ -167,21 +167,22 @@ class Villager(object):
                 self.estimate_votes[voted].append(voter)
                     
             elif "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
-                print('reached COs')
-                print(self.COs) #
+                print('reached COs') #
                 who = self.agent_talks[self.nthTalk][1]
-                print(who)
+                # print(who)
                 subject = int( self.agent_talks[self.nthTalk][2][16:18] )
-                print(subject)
+                # print(subject)
+
                 if who == subject:
                     self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
                     # consider else if an agent CO for another is significant
-                    if self.agent_talks[self.nthTalk][2][20:] == "SEER" and who not in self.seers:
+                    if self.agent_talks[self.nthTalk][2][20:] == "SEER" and not (who in self.seers):
                         self.seers.add(self.agent_talks[self.nthTalk][1])
 
-                    elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and who not in self.mediums:
+                    elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and not (who in self.mediums):
                         self.mediums.add(self.agent_talks[self.nthTalk][1])
-
+                    print(self.COs) #
+                    
             #elif "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
                 #pass # add to requestors and evaluate if a reasonable request
             
