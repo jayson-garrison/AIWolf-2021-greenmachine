@@ -21,7 +21,21 @@ class Werewolf(grnVillager.Villager):
     def update(self, base_info, diff_data, request):
         super().update(base_info, diff_data, request)
 
-        # 
+        # secondary reset
+        if not (self.currentDay == int( self.base_info['day']) ):
+            self.nthWhisper = -1
+
+        # parse whisper
+
+        #
+        
+        #
+
+        #
+
+        # heuristics
+
+
 
     def dayStart(self):
         pass
