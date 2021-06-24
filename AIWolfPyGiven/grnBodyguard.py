@@ -1,5 +1,6 @@
 """
     Contains Body Guard Class
+    07/'21
     James Hale
 """
 import aiwolfpy

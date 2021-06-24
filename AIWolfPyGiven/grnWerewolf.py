@@ -1,6 +1,8 @@
 """
     Contains Werewolf Class
-    James Hale
+    07/'21
+    Grey Bodi
+    Jayson C. Garrison
 """
 import aiwolfpy
 from aiwolfpy import contentbuilder as cb
@@ -67,7 +69,7 @@ class Werewolf(grnVillager.Villager):
                 for twolist in self.attackVote:
                     if twolist[0] == self.ally_whispers[self.nthWhisper][1]:
                         self.attackVote.remove(twolist)
-                self.attackVote.append([ self.ally_whispers[self.nthWhisper][1], self.ally_whispers[self.nthWishper][2][11:13] ])
+                self.attackVote.append([ self.ally_whispers[self.nthWhisper][1], self.ally_whispers[self.nthWhisper][2][11:13] ])
 
             elif "COMINGOUT" in self.ally_whispers[self.nthTalk][2]:
                 print('WW CO reached')
@@ -147,7 +149,8 @@ class Werewolf(grnVillager.Villager):
 
     def attack(self): # new
         print('WW Attack reached') #
-        return cb.attack(self.idx, self.grnAttack)
+        return self.grnAttack
+        # return cb.attack(self.idx, self.grnAttack)
 
     def finish(self):
-        super().finish()
+        return super().finish()

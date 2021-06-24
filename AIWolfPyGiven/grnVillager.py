@@ -1,4 +1,11 @@
 
+'''
+Contains Villager Class
+07/'21
+James Hale
+Jayson C. Garrison
+Grey Bodi
+'''
 #!/usr/bin/env python
 from __future__ import print_function, division
 
