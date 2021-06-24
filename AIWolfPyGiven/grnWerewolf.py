@@ -46,29 +46,31 @@ class Werewolf(grnVillager.Villager):
         for row in diff_data.itertuples():
             type = getattr(row,"type")
             text = getattr(row,"text")
-            if type == 'whisper':
             # update the talk list
-                if type == 'talk': # then gather the text
-                    if self.currentDay != 0 and not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
-                        whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
-                        self.ally_whispers.append(whisperList)
-                        print('new talks')
-                    else:
-                        whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
-                        self.ally_whispers.append(whisperList)
-                        print('new talks')
+            if type == 'whisper': # then gather the text
+                if self.currentDay != 0 and not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+                    whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
+                    self.ally_whispers.append(whisperList)
+                    print('new whispers')
+                else:
+                    whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
+                    self.ally_whispers.append(whisperList)
+                    self.WWs.add( int( getattr(row, 'agent') ) )
+                    print('new whispers')
         
         while self.nthWhisper < len(self.ally_whispers and not len(self.ally_whispers) == 0):
 
             self.nthWhisper += 1
 
             if "VOTE" in self.ally_whispers[self.nthTalk][2]:
+                print("WW vote reached") #
                 for twolist in self.attackVote:
                     if twolist[0] == self.ally_whispers[self.nthWhisper][1]:
                         self.attackVote.remove(twolist)
                 self.attackVote.append([ self.ally_whispers[self.nthWhisper][1], self.ally_whispers[self.nthWishper][2][11:13] ])
 
             elif "COMINGOUT" in self.ally_whispers[self.nthTalk][2]:
+                print('WW CO reached')
                 who = self.ally_whispers[self.nthTalk][1]
                 # print(who)
                 subject = int( self.ally_whispers[self.nthTalk][2][16:18] )
@@ -86,6 +88,8 @@ class Werewolf(grnVillager.Villager):
         for ally in self.WWs:
             if ally not in self.alive:
                 self.WWs.remove(ally)
+        print('WEREWOLVES:')
+        print(self.WWs)
 
         #
 
@@ -98,7 +102,7 @@ class Werewolf(grnVillager.Villager):
 
 
     def dayStart(self):
-        pass
+        super().dayStart()
 
     def talk(self): # new
         return "Over"
@@ -123,13 +127,8 @@ class Werewolf(grnVillager.Villager):
         else:
             return voteWW
 
-    def divine(self):
-        pass
-
-    def guard(self):
-        return 1
-
     def whisper(self): # new
+        print('WW Whisper reached') #
         if not self.hasCO:
             self.hasCO = True
             return cb.comingout(self.idx, self.idx, "VILLAGER")
@@ -147,6 +146,7 @@ class Werewolf(grnVillager.Villager):
         return "Over"
 
     def attack(self): # new
+        print('WW Attack reached') #
         return cb.attack(self.idx, self.grnAttack)
 
     def finish(self):

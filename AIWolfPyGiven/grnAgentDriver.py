@@ -7,6 +7,7 @@ Ground up begin by Jayson C. Garrison
 
 # import resources
 # import aiwolfpy
+import logging, json
 from aiwolfpy import contentbuilder
 # import AIWolfPyGiven.grnAgent
 import aiwolfpy
@@ -38,6 +39,9 @@ class grnAgent(object):
     def __init__(self, agentName):
         self.myName = agentName # our name 
         self.role = None # no role yet by default
+        logging.basicConfig(filename=self.myName+".log",
+                            level=logging.DEBUG,
+                            format='')
     
     # get the name
     def getName(self):
@@ -76,7 +80,6 @@ class grnAgent(object):
             pass
     
     def dayStart(self):
-        pass
         try:
             self.role.dayStart()
         except Exception:
@@ -96,28 +99,24 @@ class grnAgent(object):
             return 1
 
     def divine(self):
-        return 1
         try:
             return self.role.divine()
         except Exception:
             return 1
 
     def guard(self):
-        return 1
         try:
             return self.role.guard()
         except Exception:
             return 1
 
     def whisper(self):
-        return cb.over()
         try:
             return self.role.whisper()
         except Exception:
             return cb.over()
 
     def attack(self):
-        return 1
         try:
             return self.role.attack()
         except Exception:
