@@ -6,6 +6,7 @@ import aiwolfpy
 from aiwolfpy import contentbuilder as cb
 import grnVillager
 import logging, json
+import random
 
 class Werewolf(grnVillager.Villager):
     def __init__(self, my_name):
@@ -20,6 +21,13 @@ class Werewolf(grnVillager.Villager):
         self.nthWhisper = -1
         self.daily_vote = -1
         self.daily_estimate = -1
+        self.allyCOSeer = False
+        self.allyCOMedium = False
+        self.attackVote = []
+        self.ally_whispers = []
+        self.allyProposedAttack = []
+        self.grnAttack = -1
+
 
     def update(self, base_info, diff_data, request):
         super().update(base_info, diff_data, request)
@@ -29,11 +37,56 @@ class Werewolf(grnVillager.Villager):
             self.nthWhisper = -1
             self.daily_vote = -1
             self.daily_estimate = -1
+            self.ally_whispers = []
+            self.attackVote = []
+            self.allyProposedAttack = []
+            
 
         # parse whisper
-
-        #
+        for row in diff_data.itertuples():
+            type = getattr(row,"type")
+            text = getattr(row,"text")
+            if type == 'whisper':
+            # update the talk list
+                if type == 'talk': # then gather the text
+                    if self.currentDay != 0 and not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+                        whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
+                        self.ally_whispers.append(whisperList)
+                        print('new talks')
+                    else:
+                        whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
+                        self.ally_whispers.append(whisperList)
+                        print('new talks')
         
+        while self.nthWhisper < len(self.ally_whispers and not len(self.ally_whispers) == 0):
+
+            self.nthWhisper += 1
+
+            if "VOTE" in self.ally_whispers[self.nthTalk][2]:
+                for twolist in self.attackVote:
+                    if twolist[0] == self.ally_whispers[self.nthWhisper][1]:
+                        self.attackVote.remove(twolist)
+                self.attackVote.append([ self.ally_whispers[self.nthWhisper][1], self.ally_whispers[self.nthWishper][2][11:13] ])
+
+            elif "COMINGOUT" in self.ally_whispers[self.nthTalk][2]:
+                who = self.ally_whispers[self.nthTalk][1]
+                # print(who)
+                subject = int( self.ally_whispers[self.nthTalk][2][16:18] )
+                # print(subject)
+                if who == subject:
+                    if self.ally_whispers[self.nthTalk][2][20:] == "SEER":
+                        self.allyCOSeer = True
+                    if self.ally_whispers[self.nthTalk][2][20:] == "MEDIUM":
+                        self.allyCOMedium = True
+
+            elif "ESTIMATE" in self.ally_whispers[self.nthTalk][2]:
+                pass
+
+        # update ally alive status
+        for ally in self.WWs:
+            if ally not in self.alive:
+                self.WWs.remove(ally)
+
         #
 
         #
@@ -81,16 +134,19 @@ class Werewolf(grnVillager.Villager):
             self.hasCO = True
             return cb.comingout(self.idx, self.idx, "VILLAGER")
 
-        if len(proposedAttack)
-        elif self.currentDay < 3:
-            pass
-            #vote random villiager
+        if self.daily_vote:
+            if len(self.attackVote) > 1:
+                self.grnAttack = self.attackVote[0][1]
+                return cb.vote(self.idx, self.grnAttack)
+            elif self.currentDay < 3:
+                self.grnAttack = random.choice(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer))
+                return cb.vote(self.idx, self.grnAttack)
         
         
         return "Over"
 
     def attack(self): # new
-        pass
+        return cb.attack(self.idx, self.grnAttack)
 
     def finish(self):
         super().finish()
