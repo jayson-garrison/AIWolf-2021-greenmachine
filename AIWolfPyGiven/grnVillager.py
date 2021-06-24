@@ -304,11 +304,13 @@ class Villager(object):
                             self.likely_werewolf.add(sus)
 
             # if someone divined us as WW they are likely WW or POS
-            if self.currentDay > 1:
+            if self.currentDay > 1 and self.role:
                 for sus in self.divined:
                     if self.divined[sus] == [self.idx, 'WEREWOLF']:
                         self.likely_werewolf.add(sus)
                         self.likely_possessed.add(sus)
+
+            # role specific identification (in other classes)
 
             
     # Start of the day (no return)
