@@ -119,7 +119,16 @@ class Villager(object):
 
         # if a new day. reset the talks, estimate votes
         if not (self.currentDay == int( self.base_info['day']) ):
-            print('reached reset')
+            print('----------------------------------REACHED RESET----------------------------------') #
+            print('ALIVE:') #
+            print(self.alive) #
+            print('DEAD:') #
+            print(self.dead) #
+            print('KILLED:') #
+            print(self.killed) #
+            print('EXECUTED:') #
+            print(self.executed) #
+
             self.nthTalk = -1
             self.agent_talks = []
             self.estimate_votes = {player: [] for player in self.alive}
@@ -137,11 +146,13 @@ class Villager(object):
             if type == 'execute':
                 self.executed.add( int(getattr(row, 'agent')) )
                 self.dead.add( int(getattr(row, 'agent')) )
+                self.alive.remove( int(getattr(row, 'agent')) )
 
             # update dead players
             if type == 'dead':
                 self.killed.add( int(getattr(row, 'agent')) )
                 self.dead.add( int(getattr(row, 'agent')) )
+                self.alive.remove( int(getattr(row, 'agent')) )
 
             # update voting 
             if type == 'vote': # then...
@@ -152,7 +163,7 @@ class Villager(object):
                 if not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
                     talkList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
                     self.agent_talks.append(talkList)
-                    print('type rist reached')
+                    print('new talks')
 
         # for new talks do:
         #endPos = len(self.agent_talks)
@@ -163,14 +174,15 @@ class Villager(object):
 
             # agent 0
             if "VOTE" in self.agent_talks[self.nthTalk][2]:
-                
+                print('reached VOTE')
                 voter = self.agent_talks[self.nthTalk][1]
                 voted = int( self.agent_talks[self.nthTalk][2][11:13] )
                 for key_voted in self.estimate_votes:
                     if voter in self.estimate_votes[key_voted]:
                         self.estimate_votes[key_voted].remove(voter)
                 self.estimate_votes[voted].append(voter)
-                    
+                print(self.estimate_votes) #
+
             elif "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
                 print('reached COs') #
                 who = self.agent_talks[self.nthTalk][1]
@@ -184,10 +196,15 @@ class Villager(object):
                     if self.agent_talks[self.nthTalk][2][20:] == "SEER" and not (who in self.seers):
                         #self.seers.add(self.agent_talks[self.nthTalk][1])
                         self.seers[self.agent_talks[self.nthTalk][1]] = 0
+                        print('seers:')
+                        print(self.seers) #
 
                     elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and not (who in self.mediums):
                         #self.mediums.add(self.agent_talks[self.nthTalk][1])
-                        self.seers[self.agent_talks[self.nthTalk][1]] = 0
+                        self.mediums[self.agent_talks[self.nthTalk][1]] = 0
+                        print('mediums:')
+                        print(self.mediums) #
+
                     print(self.COs) #
 
             #elif "ESTIMATE" in self.agent_talks[self.nthTalk][2]:
@@ -207,27 +224,33 @@ class Villager(object):
                     self.seers[self.agent_talks[self.nthTalk][1]] = 0
                 elif species == "WEREWOLF":
                     self.seers[self.agent_talks[self.nthTalk][1]] += 1
+
                 print(self.divined) #
+                print('seers:')
+                print(self.seers) #
 
             elif "IDENTIFIED" in self.agent_talks[self.nthTalk][2]:
+                print('reached IDE')
                 # add to likely mediums 
                 target = int(self.agent_talks[self.nthTalk][2][17:19])
                 species = self.agent_talks[self.nthTalk][2][21:]
                 if self.agent_talks[self.nthTalk][1] in self.identified: #not the first divine
-                    self.identified[self.agent_talks[self.nthTalk][1]].add([target, species])
+                    self.identified[self.agent_talks[self.nthTalk][1]].append([target, species])
                 else: #first divine
                     self.identified[self.agent_talks[self.nthTalk][1]] = [[target, species]]
                 if self.agent_talks[self.nthTalk][1] not in self.mediums:
                     self.mediums[self.agent_talks[self.nthTalk][1]] = 0
                 elif species == "WEREWOLF":
                     self.mediums[self.agent_talks[self.nthTalk][1]] += 1
-                
+
+                print(self.identified) #
+                print('mediums:') #
+                print(self.mediums) #
+
             elif "GUARDED" in self.agent_talks[self.nthTalk][2]:
                 # add to likely bodyguard
                 self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
         
-            
-
             '''
             # agent 0.5
             if "INQUIRE" in self.agent_talks[self.nthTalk][2]:
