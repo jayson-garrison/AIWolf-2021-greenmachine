@@ -19,8 +19,8 @@ class Werewolf(grnVillager.Villager):
         self.seer_target = set()
         self.bodyguard_target = set()
         self.nthWhisper = -1
-        self.daily_vote = -1
-        self.daily_estimate = -1
+        self.daily_vote = True
+        self.daily_estimate = True
         self.allyCOSeer = False
         self.allyCOMedium = False
         self.attackVote = []
@@ -35,8 +35,8 @@ class Werewolf(grnVillager.Villager):
         # secondary reset
         if not (self.currentDay == int( self.base_info['day']) ):
             self.nthWhisper = -1
-            self.daily_vote = -1
-            self.daily_estimate = -1
+            self.daily_vote = True
+            self.daily_estimate = True
             self.ally_whispers = []
             self.attackVote = []
             self.allyProposedAttack = []
@@ -135,6 +135,7 @@ class Werewolf(grnVillager.Villager):
             return cb.comingout(self.idx, self.idx, "VILLAGER")
 
         if self.daily_vote:
+            self.daily_vote = False
             if len(self.attackVote) > 1:
                 self.grnAttack = self.attackVote[0][1]
                 return cb.vote(self.idx, self.grnAttack)
