@@ -80,6 +80,10 @@ class Villager(object):
         self.bodyguards = set()
         self.likely_human = set()
         self.likely_werewolf = set()
+        self.likely_seer = set()
+        self.likely_medium = set()
+        self.likely_possessed = set()
+        self.likely_bodyguard = set()
         # not sure if likely human or werewolf. Make sure likely_human + likely_werewolf + unknown = others
         self.unknown = self.others.copy()
         # agents who request something of me
@@ -94,6 +98,7 @@ class Villager(object):
         self.repeatTalk = False
         self.unaccused = self.alive.copy()
         self.will_vote = []
+        self.talk_cases = set()
 
 
 
@@ -270,7 +275,42 @@ class Villager(object):
             if "XOR" in self.agent_talks[self.nthTalk][2]:
                 pass
             '''
+            # estimate roles
 
+            # if only 1 medium CO that medium is trustworthy
+            if len(self.mediums) == 1 and self.currentDay != 1:
+                self.likely_medium.add( next(iter(self.mediums.values())) )
+                self.likely_human.add( next(iter(self.mediums.values())) )
+            
+            # if only 1 seer CO that seer is trustworthy
+            if len(self.seers) == 1 and self.currentDay != 1:
+                self.likely_seers.add( next(iter(self.seers.values())) )
+                self.likely_human.add( next(iter(self.seers.values())) )
+
+            # those who div on day 1 WW are suspicous - 3/14 RNG
+            if len(self.seers) > 1 and self.currentDay == 1:
+                for sus in self.seers:
+                    if self.seers[sus] > 0:
+                        self.likely_possessed.add(sus)
+                        self.likely_werewolf.add(sus)
+            
+            # seers who CO and were killed are deemed innocent, the others are suspicous
+            if len(self.seers) > 1:
+                for inno in self.seers:
+                    if inno in self.killed:
+                        susSeers = self.seers.copy()  
+                        susSeers.pop(inno)
+                        for sus in susSeers:
+                            self.likely_werewolf.add(sus)
+
+            # if someone divined us as WW they are likely WW or POS
+            if self.currentDay > 1:
+                for sus in self.divined:
+                    if self.divined[sus] == [self.idx, 'WEREWOLF']:
+                        self.likely_werewolf.add(sus)
+                        self.likely_possessed.add(sus)
+
+            
     # Start of the day (no return)
     def dayStart(self):
         self.talkTurn = 0 # keep track of number of times we have talked today 
@@ -285,13 +325,13 @@ class Villager(object):
         if self.talkTurn < 10: # max of 10 talks 
             self.talkTurn += 1
 
-            # day 1 voting logic
+            # day 1 talking logic
             if int(self.base_info['day']) == 1:
                 # 30% CO Villager
                 if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
                     self.hasCO = True
                     return cb.comingout(self.idx, self.idx, 'VILLAGER')
-                elif self.talkTurn < 4:
+                elif self.talkTurn < 5:
                     if len(self.seers) > 1:
                         for targ in self.seers:
                             if self.seers[targ] > 0:
@@ -300,6 +340,7 @@ class Villager(object):
                         cb.skip()
                 else: return cb.over()
 
+            # day 2 talk logic
             if int(self.base_info['day']) == 2:
                 if len(self.seers) > 1:
                     for targ in self.seers:
@@ -323,16 +364,29 @@ class Villager(object):
     # agent as the return
     # act based on the lists
     def vote(self):
-        if self.currentDay == 1:
-            return -1
-        if self.currentDay == 2:
-            return next(iter(self.likely_werewolf))
         logging.debug("# VOTE")
+        max = -1
+        maxWW = -1
+        voteWW = -1
+        voteHim = -1
+        for player in self.estimate_votes:
+            if len(self.estimate_votes[player]) > max:
+                max = len(self.estimate_votes[player])
+                voteHim = player
+                if player in self.alive.union(self.likely_werewolf):
+                    maxWW = len(self.estimate_votes[player])
+                    voteWW = player
+        if voteHim in self.likely_werewolf or self.currentDay < 4:
+            return voteHim
+
+        else:
+            return voteWW
+        
+        '''
         for targ in self.COs:
             if "WEREWOLF" in self.COs[targ]:
                 return targ
-
-        return self.base_info['agentIdx']
+        '''
 
     # Finish (no return)
     def finish(self):
