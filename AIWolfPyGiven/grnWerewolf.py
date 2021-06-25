@@ -16,7 +16,7 @@ class Werewolf(grnVillager.Villager):
 
     def initialize(self, base_info, diff_data, game_setting): # new variables
         super().initialize(base_info, diff_data, game_setting)
-        self.WWs = set()
+        self.WWs = set(map(lambda i: int(i), self.base_info["roleMap"].keys()))
         self.medium_target = set()
         self.seer_target = set()
         self.bodyguard_target = set()
@@ -33,36 +33,45 @@ class Werewolf(grnVillager.Villager):
 
     def update(self, base_info, diff_data, request):
         super().update(base_info, diff_data, request)
-
+        print('$$$$$$$$$ WW WHISPERS $$$$$$$$$') #
+        print(self.ally_whispers)
         # secondary reset
-        if not (self.currentDay == int( self.base_info['day']) ):
-            self.nthWhisper = -1
-            self.daily_vote = True
-            self.daily_estimate = True
-            self.ally_whispers = []
-            self.attackVote = []
-            self.allyProposedAttack = []
+        # if not (self.currentDay == int( self.base_info['day']) ):
+            # pass
             
-
         # parse whisper
-        for row in diff_data.itertuples():
-            type = getattr(row,"type")
-            text = getattr(row,"text")
-            # update the talk list
-            if type == 'whisper': # then gather the text
-                if self.currentDay != 0 and not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+        if request == 'WHISPER':
+            for row in diff_data.itertuples():
+                print('step ', end = '')
+                type = getattr(row,"type")
+                text = getattr(row,"text")
+
+                # get ally WWs, do not add me to the set
+                if type == 'initialize':
+                    print('INIT reached') #
+                    # phrase = str(text)
+                    if self.idx != int( getattr(row, 'agent') ):
+                        print( int( getattr(row, 'agent') ) )
+                        self.WWs.add( int(getattr(row, 'agent')) )
+                
+                # update the talk list
+                if type == 'whisper': # then gather the text
+                    print('WW gather whisper reached') #
+                    # if not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+                    print('IF reached')
                     whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
                     self.ally_whispers.append(whisperList)
                     print('new whispers')
-                else:
-                    whisperList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
-                    self.ally_whispers.append(whisperList)
-                    self.WWs.add( int( getattr(row, 'agent') ) )
-                    print('new whispers')
-        
+            
+        # super().update(base_info, diff_data, request)
+
+        # parsing whisperList
         while self.nthWhisper < len(self.ally_whispers and not len(self.ally_whispers) == 0):
 
             self.nthWhisper += 1
+
+            if "ATTACK" in self.ally_whispers[self.nthTalk][2]:
+                pass
 
             if "VOTE" in self.ally_whispers[self.nthTalk][2]:
                 print("WW vote reached") #
@@ -99,12 +108,14 @@ class Werewolf(grnVillager.Villager):
 
         # heuristics
 
-        
-
-
-
     def dayStart(self):
         super().dayStart()
+        self.nthWhisper = -1
+        self.daily_vote = True
+        self.daily_estimate = True
+        self.ally_whispers = []
+        self.attackVote = []
+        self.allyProposedAttack = []
 
     def talk(self): # new
         return "Over"

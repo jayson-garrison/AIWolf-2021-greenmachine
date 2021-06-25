@@ -114,6 +114,7 @@ class Villager(object):
     # add to lists (majority of the work)
     def update(self, base_info, diff_data, request):
         # print('reached update') #
+        print('*************** AGENT TALKS ***************')
         print(self.agent_talks)
         logging.debug("# UPDATE")
         logging.debug("Request:")
@@ -130,22 +131,8 @@ class Villager(object):
         # scan diff_data for different info based on type
 
         # if a new day. reset the talks, estimate votes
-        if not (self.currentDay == int( self.base_info['day']) ):
-            print('----------------------------------REACHED RESET----------------------------------') #
-            print('ALIVE:') #
-            print(self.alive) #
-            print('DEAD:') #
-            print(self.dead) #
-            print('KILLED:') #
-            print(self.killed) #
-            print('EXECUTED:') #
-            print(self.executed) #
-
-            self.nthTalk = -1
-            self.agent_talks = []
-            self.estimate_votes = {player: [] for player in self.alive}
-            self.repeatTalk = False
-            self.unaccused = self.alive.copy()
+        #if not (self.currentDay == int( self.base_info['day']) ):
+           #pass
 
         self.currentDay = int(self.base_info['day'])
 
@@ -324,6 +311,21 @@ class Villager(object):
     def dayStart(self):
         self.talkTurn = 0 # keep track of number of times we have talked today 
         logging.debug("# DAYSTART")
+        print('----------------------------------REACHED RESET----------------------------------') #
+        print('ALIVE:') #
+        print(self.alive) #
+        print('DEAD:') #
+        print(self.dead) #
+        print('KILLED:') #
+        print(self.killed) #
+        print('EXECUTED:') #
+        print(self.executed) #
+
+        self.nthTalk = -1
+        self.agent_talks = []
+        self.estimate_votes = {player: [] for player in self.alive}
+        self.repeatTalk = False
+        self.unaccused = self.alive.copy()
         return None
 
     # conversation actions: require a properly formatted
