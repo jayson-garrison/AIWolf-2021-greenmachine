@@ -152,7 +152,7 @@ class Werewolf(grnVillager.Villager):
                 self.grnAttack = self.attackVote[0][1]
                 return cb.vote(self.idx, self.grnAttack)
             elif self.currentDay < 3:
-                self.grnAttack = random.choice(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer))
+                self.grnAttack = random.choice(list(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer)))
                 return cb.vote(self.idx, self.grnAttack)
         
         

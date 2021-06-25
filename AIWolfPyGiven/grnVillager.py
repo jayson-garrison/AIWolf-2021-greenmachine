@@ -114,7 +114,6 @@ class Villager(object):
     # add to lists (majority of the work)
     def update(self, base_info, diff_data, request):
         # print('reached update') #
-        print('*************** AGENT TALKS ***************')
         print(self.agent_talks)
         logging.debug("# UPDATE")
         logging.debug("Request:")
@@ -131,8 +130,22 @@ class Villager(object):
         # scan diff_data for different info based on type
 
         # if a new day. reset the talks, estimate votes
-        #if not (self.currentDay == int( self.base_info['day']) ):
-           #pass
+        if not (self.currentDay == int( self.base_info['day']) ):
+            print('----------------------------------REACHED RESET----------------------------------') #
+            print('ALIVE:') #
+            print(self.alive) #
+            print('DEAD:') #
+            print(self.dead) #
+            print('KILLED:') #
+            print(self.killed) #
+            print('EXECUTED:') #
+            print(self.executed) #
+
+            self.nthTalk = -1
+            self.agent_talks = []
+            self.estimate_votes = {player: [] for player in self.alive}
+            self.repeatTalk = False
+            self.unaccused = self.alive.copy()
 
         self.currentDay = int(self.base_info['day'])
 
@@ -278,7 +291,7 @@ class Villager(object):
             
             # if only 1 seer CO that seer is trustworthy
             if len(self.seers) == 1 and self.currentDay != 1:
-                self.likely_seers.add( next(iter(self.seers.values())) )
+                self.likely_seer.add( next(iter(self.seers.values())) )
                 self.likely_human.add( next(iter(self.seers.values())) )
 
             # those who div on day 1 WW are suspicous - 3/14 RNG
@@ -311,21 +324,6 @@ class Villager(object):
     def dayStart(self):
         self.talkTurn = 0 # keep track of number of times we have talked today 
         logging.debug("# DAYSTART")
-        print('----------------------------------REACHED RESET----------------------------------') #
-        print('ALIVE:') #
-        print(self.alive) #
-        print('DEAD:') #
-        print(self.dead) #
-        print('KILLED:') #
-        print(self.killed) #
-        print('EXECUTED:') #
-        print(self.executed) #
-
-        self.nthTalk = -1
-        self.agent_talks = []
-        self.estimate_votes = {player: [] for player in self.alive}
-        self.repeatTalk = False
-        self.unaccused = self.alive.copy()
         return None
 
     # conversation actions: require a properly formatted
@@ -384,7 +382,7 @@ class Villager(object):
             if len(self.estimate_votes[player]) > max:
                 max = len(self.estimate_votes[player])
                 voteHim = player
-                if player in self.alive.union(self.likely_werewolf):
+            if len(self.estimate_votes[player]) > maxWW and player in self.alive.union(self.likely_werewolf):
                     maxWW = len(self.estimate_votes[player])
                     voteWW = player
         if voteHim in self.likely_werewolf or self.currentDay < 4:
