@@ -28,14 +28,15 @@ class Seer(grnVillager.Villager):
         self.current_div_as_WW = set()
         self.current_div_as_HU = set()
         self.targets = set()
+        self.accuse = 0
     def update(self, base_info, diff_data, request):
         super().update(base_info, diff_data, request)
 
         # catergorize / group fakes 
         for poser in self.seers:
-            if poser != self.idx:
-                self.fake_seers.add(poser)
-                self.certain_ww_aligned.add(poser)
+            if poser[0] != self.idx:
+                self.fake_seers.add(poser[0])
+                self.certain_ww_aligned.add(poser[0])
             
 
         # parse diff_data for divs
@@ -75,6 +76,7 @@ class Seer(grnVillager.Villager):
         self.daily_push_vote = 0
         self.daily_div_claim = False
         self.div_WW_today = False
+        self.accuse = 0
         #self.current_div_as_HU = set()
         #self.current_div_as_WW = set()
         return None
@@ -88,38 +90,56 @@ class Seer(grnVillager.Villager):
             if not self.hasCO:
                 self.hasCO = True
                 return cb.comingout(self.idx, self.idx, 'SEER')
-            if len(self.divHU) != 0 and not self.daily_div_claim: # div HU day 0, report
+            # div HU day 0, report
+            if len(self.divHU) != 0 and not self.daily_div_claim: 
                 self.daily_div_claim = True
                 return cb.divined(self.idx, list(self.divHU)[0], 'HUMAN')
-            elif len(self.divWW) != 0: # if div WW then skip
+            # if div WW then skip
+            elif len(self.divWW) != 0: 
                 self.divined_WW_day_0 = True
                 print("DIV WW 0 TRUE")
                 return cb.skip()
+            elif len(self.certain_ww_aligned) != 0 and self.accuse < 1:
+                self.accuse += 1
+                return cb.logicalor(self.idx, cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'POSSESSED'), cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'WEREWOLF'))
+            elif self.accuse < 2:
+                self.accuse += 1
+                return cb.because(self.idx, cb.comingout(self.idx, self.idx, 'SEER'), cb.comingout(self.idx,list(self.certain_ww_aligned)[0], 'SEER' ))
             else:
                 return cb.over()
 
         # day 2 logic
         elif self.currentDay == 2:
             print('DAY 2 REACHED')
+            # case 1, div ww day 0/1
             if not self.daily_div_claim and ( self.divined_WW_day_0 or len(self.divWW) != 0 ):
-                print('CASE 1 REACHED: DIV WW DAY 0/1 - REPORT')
+                # print('CASE 1 REACHED: DIV WW DAY 0/1 - REPORT')
                 self.div_WW_today = True
                 self.daily_div_claim = True
                 return cb.divined(self.idx, list(self.divWW)[0], 'WEREWOLF')
+            # case 2 div hu
             elif not ( self.daily_div_claim ): # self.divined_WW_day_0 and 
-                print('CASE 2 REACHED: DIV ONLY HUs REPORT ONE')
+                # print('CASE 2 REACHED: DIV ONLY HUs REPORT ONE')
                 self.daily_div_claim = True
                 return cb.divined(self.idx, list(self.divHU)[0], 'HUMAN') # div 2 WW in day 0 and 1; this is from day 0
+            # cont case 1, push vote WW
             elif self.daily_div_claim and self.daily_push_vote < 2 and self.div_WW_today:
-                print('CASE 3 REACHED: PUSH VOTE WW DIV')
-                 # print("#################### VOTE CLAIM")
+                # print('CASE 3 REACHED: PUSH VOTE WW DIV')
+                # print("#################### VOTE CLAIM")
                 self.daily_push_vote += 1
                 return cb.vote(self.idx, list(self.divWW)[0])
             elif self.daily_push_vote == 2:
-                print('CASE 4 REACHED: SKIP AFTER PUSH VOTE')
+                # print('CASE 4 REACHED: SKIP AFTER PUSH VOTE')
                 return cb.skip()
+            # accuse other fake seers
+            elif len(self.certain_ww_aligned) != 0 and self.accuse < 1:
+                self.accuse += 1
+                return cb.logicalor(self.idx, cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'POSSESSED'), cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'WEREWOLF'))
+            elif self.accuse < 2:
+                return cb.because(self.idx, cb.comingout(self.idx, self.idx, 'SEER'), cb.comingout(self.idx,list(self.certain_ww_aligned)[0], 'SEER' ))
             else:
                 return cb.over()
+        # for the nth day after 2 (late game)
         elif self.currentDay > 2:
             print('N DAY REACHED')
             if len(self.current_div_as_WW) != 0:
@@ -164,18 +184,14 @@ class Seer(grnVillager.Villager):
         
 
     def vote(self):
-        if self.currentDay < 2:
-            return super().vote()
+        if len(self.targets) == 0:
+            super.vote()
         else:
-            return self.targets[0]
+            return list(self.targets)[0] # vote the targeted player
 
     def divine(self):
         # div rand on day 0
-
-        if self.currentDay == -1: # needs work
-            return 2
-        elif True: 
-            return random.choice( list( self.alive.difference(self.meSet).difference(self.all_divs) ) )
+        return random.choice( list( self.alive.difference(self.meSet).difference(self.all_divs) ) )
 
         # on day 1 and on there is no need to div copy seers / mediums as we know they are evil
 

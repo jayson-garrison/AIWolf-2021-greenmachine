@@ -85,10 +85,11 @@ class Possessed(grnVillager.Villager):
     def vote(self):
         for player in self.previousDivined:
             if self.previousDivined[player] == "WEREWOLF":
-                return cb.vote(self.idx, player)
+                return player
         for player in self.COs:
             if "SEER" in self.COs[player]:
-                return cb.vote(self.idx, player)
+                return player
+        super.vote()
         #if no accused werewolves and no other seers, vote someone random
 
 
