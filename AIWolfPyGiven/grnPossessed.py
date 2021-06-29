@@ -46,7 +46,13 @@ class Possessed(grnVillager.Villager):
                     return cb.comingout(self.idx, self.idx, 'SEER')
                 elif self.daily_divine:
                     self.daily_divine = False
-                    return self.fakedivine("HUMAN")
+                    #return self.fakedivine("HUMAN")
+                    try:
+                        target = random.choice(list(self.alive.difference(set(self.idx)).difference(self.likely_seer).difference(set(self.previousDivined.keys()))))
+                    except: #empty list
+                        return cb.skip()
+                    self.previousDivined[target] = "HUMAN"
+                    return cb.divined(self.idx, target, "HUMAN")
                 else:
                     return cb.over()
             elif self.currentDay == 2:
