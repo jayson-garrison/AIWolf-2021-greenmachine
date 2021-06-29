@@ -34,9 +34,9 @@ class Seer(grnVillager.Villager):
 
         # catergorize / group fakes 
         for poser in self.seers:
-            if poser[0] != self.idx:
-                self.fake_seers.add(poser[0])
-                self.certain_ww_aligned.add(poser[0])
+            if poser != self.idx:
+                self.fake_seers.add(poser)
+                self.certain_ww_aligned.add(poser)
             
 
         # parse diff_data for divs
@@ -99,12 +99,15 @@ class Seer(grnVillager.Villager):
                 self.divined_WW_day_0 = True
                 print("DIV WW 0 TRUE")
                 return cb.skip()
-            elif len(self.certain_ww_aligned) != 0 and self.accuse < 1:
+            elif len(self.certain_ww_aligned) != 0 and self.accuse < 2:
+                print('ACCUSE REACHED')
                 self.accuse += 1
-                return cb.logicalor(self.idx, cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'POSSESSED'), cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'WEREWOLF'))
-            elif self.accuse < 2:
-                self.accuse += 1
-                return cb.because(self.idx, cb.comingout(self.idx, self.idx, 'SEER'), cb.comingout(self.idx,list(self.certain_ww_aligned)[0], 'SEER' ))
+                if self.accuse <= 1:
+                    print('ACCUSE REACHED 1')
+                    return cb.logicalxor(self.idx, cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'POSSESSED'), cb.estimate(self.idx, list(self.certain_ww_aligned)[0], 'WEREWOLF'))
+                else:
+                    print('ACCUSE REACHED 2')
+                    return cb.because(self.idx, cb.comingout(self.idx, self.idx, 'SEER'), cb.comingout(self.idx,list(self.certain_ww_aligned)[0], 'SEER' ))
             else:
                 return cb.over()
 
@@ -184,14 +187,22 @@ class Seer(grnVillager.Villager):
         
 
     def vote(self):
-        if len(self.targets) == 0:
-            super.vote()
+        # early game voting
+        if self.currentDay < 2:
+            # case in day 1 or 2 where there are no div WWs
+            if len(self.divWW) == 0:
+                    if len(self.fake_seers) != 0:
+                        return list(self.fake_seers)[0]
+                    else:
+                        super.vote()
+            else:
+                return list(self.targets)[0] 
         else:
             return list(self.targets)[0] # vote the targeted player
 
     def divine(self):
         # div rand on day 0
-        return random.choice( list( self.alive.difference(self.meSet).difference(self.all_divs) ) )
+        return random.choice( list( self.alive.difference(self.meSet).difference(self.all_divs).difference(self.fake_seers) ) )
 
         # on day 1 and on there is no need to div copy seers / mediums as we know they are evil
 
