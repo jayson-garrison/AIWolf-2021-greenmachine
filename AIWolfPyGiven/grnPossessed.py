@@ -41,18 +41,14 @@ class Possessed(grnVillager.Villager):
         if self.talkTurn < 10: # max of 10 talks 
             self.talkTurn += 1
             if self.currentDay == 1:
+                #print("[+] REACHED DAY 1. DD =" + str(self.daily_divine))
                 if not self.hasCO:
                     self.hasCO = True
                     return cb.comingout(self.idx, self.idx, 'SEER')
                 elif self.daily_divine:
+                    #print("[+] REACHED DAILY DIVINE DAY 1")
                     self.daily_divine = False
-                    #return self.fakedivine("HUMAN")
-                    try:
-                        target = random.choice(list(self.alive.difference(set(self.idx)).difference(self.likely_seer).difference(set(self.previousDivined.keys()))))
-                    except: #empty list
-                        return cb.skip()
-                    self.previousDivined[target] = "HUMAN"
-                    return cb.divined(self.idx, target, "HUMAN")
+                    return self.fakedivine("HUMAN")
                 else:
                     return cb.over()
             elif self.currentDay == 2:
@@ -69,7 +65,7 @@ class Possessed(grnVillager.Villager):
                 if self.daily_divine:
                     self.daily_divine = False
                     #divine a human or werewolf..
-                    if self.daily_wwhuman <= 35 and len(self.previousDivined) < 4: #numbers here TBD
+                    if self.daily_wwhuman <= 35 and len(self.previousDivined) < 5: #numbers here TBD
                         #going to divine as werewolf
                         return self.fakedivine("WEREWOLF")
                     else:
@@ -77,7 +73,7 @@ class Possessed(grnVillager.Villager):
                         return self.fakedivine("HUMAN")
                 elif self.daily_vote < 4:
                     self.daily_vote += 1
-                    for player in self.previousDivined:
+                    for player in set(self.previousDivined.keys()).difference(self.dead):
                         if self.previousDivined[player] == "WEREWOLF":
                             return cb.vote(self.idx, player)
                     return cb.over()
@@ -96,6 +92,7 @@ class Possessed(grnVillager.Villager):
             if "SEER" in self.COs[player]:
                 return player
         #if no accused werewolves and no other seers, vote someone random
+        return super().vote()
 
 
     def finish(self):
@@ -103,7 +100,7 @@ class Possessed(grnVillager.Villager):
 
     def fakedivine(self, role):
         try:
-            target = random.choice(list(self.alive.difference(set(self.idx)).difference(self.likely_seer).difference(set(self.previousDivined.keys()))))
+            target = random.choice(list(self.alive.difference({self.idx}).difference(self.likely_seer).difference(set(self.previousDivined.keys()))))
         except: #empty list
             return cb.skip()
         self.previousDivined[target] = role
