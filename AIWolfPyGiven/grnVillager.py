@@ -99,14 +99,21 @@ class Villager(object):
         # format:
         # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
-        self.nthTalk = -1
+        # counting votes 
         self.estimate_votes = {player: [] for player in self.alive}
+        # keeping track of temp info
+        self.nthTalk = -1
         self.currentDay = -1
         self.repeatTalk = False
         self.unaccused = self.alive.copy()
         self.will_vote = []
         self.talk_cases = set()
-
+        self.estimate = 0
+        self.accuse = 0
+        # if these ever equal 2 then villager has estimated and logically claimed that there is a true role
+        self.true_medium_state = 0
+        self.true_seer_state = 0
+        self.daily_push_vote = 0
 
 
 
@@ -130,22 +137,8 @@ class Villager(object):
         # scan diff_data for different info based on type
 
         # if a new day. reset the talks, estimate votes
-        if not (self.currentDay == int( self.base_info['day']) ):
-            print('----------------------------------REACHED RESET----------------------------------') #
-            print('ALIVE:') #
-            print(self.alive) #
-            print('DEAD:') #
-            print(self.dead) #
-            print('KILLED:') #
-            print(self.killed) #
-            print('EXECUTED:') #
-            print(self.executed) #
-
-            self.nthTalk = -1
-            self.agent_talks = []
-            self.estimate_votes = {player: [] for player in self.alive}
-            self.repeatTalk = False
-            self.unaccused = self.alive.copy()
+        # if not (self.currentDay == int( self.base_info['day']) ):
+            
 
         self.currentDay = int(self.base_info['day'])
 
@@ -322,8 +315,27 @@ class Villager(object):
             
     # Start of the day (no return)
     def dayStart(self):
-        self.talkTurn = 0 # keep track of number of times we have talked today 
+        # keep track of number of times we have talked today 
+        self.talkTurn = 0 
         logging.debug("# DAYSTART")
+        print('----------------------------------REACHED RESET----------------------------------') #
+        print('ALIVE:') #
+        print(self.alive) #
+        print('DEAD:') #
+        print(self.dead) #
+        print('KILLED:') #
+        print(self.killed) #
+        print('EXECUTED:') #
+        print(self.executed) #
+
+        # resets
+        self.nthTalk = -1
+        self.agent_talks = []
+        self.estimate_votes = {player: [] for player in self.alive}
+        self.repeatTalk = False
+        self.unaccused = self.alive.copy()
+        self.estimate = 0
+        self.accuse = 0
         return None
 
     # conversation actions: require a properly formatted
@@ -364,8 +376,30 @@ class Villager(object):
                     return cb.estimate(self.idx, next(iter(self.seers.values())), "SEER")
                 else:
                     return cb.skip()
-
-            return cb.over() # talk 
+                    
+            # late game logic
+            if int(self.base_info['day']) > 2:
+                # if only one medium then estimate true medium 
+                if len(self.likely_medium) == 1:
+                    if self.true_medium_state == 0:
+                        self.true_medium_state += 1
+                        return cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' )
+                    if self.true_medium_state == 1:
+                        self.repeatMediumLogic += 1
+                        return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' ), cb.comingout(list(self.likely_medium)[0], list(self.likely_medium)[0], 'MEDIUM') )
+                # if only one seer then estimate true seer
+                elif len(self.likely_seer) == 1:
+                    if self.true_seer_state == 0:
+                        self.true_seer_state += 1
+                        return cb.estimate(self.idx, list(self.likely_seer)[0], 'SEER' )
+                    if self.true_seer_state == 1:
+                        self.true_seer_state += 1
+                        return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_seer[0], 'SEER' )), cb.comingout(list(self.likely_seer)[0], list(self.likely_medium)[0], 'SEER') )
+                # claim to vote someone, need probTable
+                elif self.daily_push_vote < 3: 
+                    self.daily_push_vote += 1
+                    return cb.vote(self.idx, 1)
+                else: return cb.over() # talk 
         else:
             return cb.over() # by default, ret over
 
@@ -390,26 +424,8 @@ class Villager(object):
 
         else:
             return voteWW
-        
-        '''
-        for targ in self.COs:
-            if "WEREWOLF" in self.COs[targ]:
-                return targ
-        '''
 
     # Finish (no return)
     def finish(self):
         logging.debug("# FINISH")
         return None
-
-# Do not need this as the driver function initializes it
-''' 
-agent = grnVillager(myname)
-
-# run
-if __name__ == '__main__':
-    AIWolfPyGiven.aiwolfpy.connect_parse(agent)
-'''
-
-
-
