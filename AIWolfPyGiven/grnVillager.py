@@ -82,7 +82,7 @@ class Villager(object):
         self.executed = set()
         # make sure executed + killed = dead
         self.killed = set() 
-        self.seers = dict()
+        self.seers = dict() # key: seer, value: an integer cooresponding to how any werewolf divines there are
         self.mediums = dict()
         self.bodyguards = set()
         self.likely_human = set()

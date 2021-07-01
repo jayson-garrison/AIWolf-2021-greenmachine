@@ -18,6 +18,7 @@ class Possessed(grnVillager.Villager):
         self.daily_divine = True
         self.daily_vote = 0
         self.daily_wwhuman = random.randint(1,100)
+        self.trueSeer = -1
 
     def initialize(self, base_info, diff_data, game_setting):
         super().initialize(base_info, diff_data, game_setting)
@@ -27,6 +28,14 @@ class Possessed(grnVillager.Villager):
         for player in self.previousDivined:
             if player in self.dead:
                 self.previousDivined.pop(player)
+        
+        if len(self.seers) == 2:
+            allSeers = self.seers.keys()
+            allSeers.remove(self.idx)
+            self.trueSeer = allSeers[0]
+        elif len(self.seers) > 2:
+            self.trueSeer = -1    
+            
         #heuristics:
         #no one else can be possessed
 
@@ -100,7 +109,10 @@ class Possessed(grnVillager.Villager):
 
     def fakedivine(self, role):
         try:
-            target = random.choice(list(self.alive.difference({self.idx}).difference(self.likely_seer).difference(set(self.previousDivined.keys()))))
+            targSet = self.alive.difference({self.idx}).difference(self.likely_seer).difference(set(self.previousDivined.keys()))
+            if self.trueSeer > 0 and targSet.difference(set(self.divined[self.trueSeer])):
+                target = targSet.difference(set(self.divined[self.trueSeer]))
+            else: target = random.choice(list(targSet))
         except: #empty list
             return cb.skip()
         self.previousDivined[target] = role
