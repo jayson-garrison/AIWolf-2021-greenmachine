@@ -14,13 +14,13 @@ class BodyGuard(grnVillager.Villager):
         super().initialize(base_info, diff_data, game_setting)
 
     def update(self, base_info, diff_data, request):
-        pass
+        super().update(base_info, diff_data, request)
 
     def dayStart(self):
-        pass
+        super().dayStart()
 
     def talk(self):
-        return "Over"
+        return super().talk()
 
     def vote(self):
         return 1
