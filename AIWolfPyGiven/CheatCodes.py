@@ -54,7 +54,7 @@ class CheatCodes(object):
             print("[-] Error in cheatcodes set(): make sure column name in column list")
             return
         #[1] update the target
-        self.table[row][col] = value
+        self.table[row][col] += value
 
         #[2] update the target's row (iterate over roles)
         nocol = list(range(0, len(self.table[row])))
@@ -77,13 +77,15 @@ class CheatCodes(object):
             for colIter in nocol:
                 self.table[rowIter][colIter] += value / ((len(self.table) - 1) * (len(self.table[row]) - 1))
 
-
+    def setu(self, player, columnName, value):
+        incrimentVal = value - self.get(player, columnName)
+        return self.update(player, columnName, incrimentVal)
     
 
 inst = CheatCodes({"POSSESSED":1, "WEREWOLF":3, "S/M":2})
 for i in inst.table:
     print(i) 
 print('--------------')
-inst.update(2, "POSSESSED", 0.5)
+inst.setu(2, "POSSESSED", 1)
 for i in inst.table:
     print(i) 

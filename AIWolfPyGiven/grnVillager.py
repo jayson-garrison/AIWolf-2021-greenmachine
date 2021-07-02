@@ -22,6 +22,7 @@ import aiwolfpy
 from aiwolfpy import contentbuilder as cb
 import logging, json
 import random
+from CheatCodes import CheatCodes
 
 myname = 'greenmachine'
 
@@ -114,7 +115,10 @@ class Villager(object):
         self.true_medium_state = 0
         self.true_seer_state = 0
         self.daily_push_vote = 0
-
+        self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
+        self.prev_estimate_votes = {player: [] for player in self.alive}
+        self.prev_voted_out = -1
+        self.votes = {player: [] for player in self.alive}
 
 
     # new information (no return)
@@ -152,6 +156,7 @@ class Villager(object):
                 self.executed.add( int(getattr(row, 'agent')) )
                 self.dead.add( int(getattr(row, 'agent')) )
                 self.alive.remove( int(getattr(row, 'agent')) )
+                self.prev_voted_out = int(getattr(row, 'agent'))
 
             # update dead players
             if type == 'dead':
@@ -161,7 +166,9 @@ class Villager(object):
 
             # update voting 
             if type == 'vote': # then...
-                pass
+                voter = int(getattr(row, 'agent'))
+                voted = text[11:13] # UPDATE WITH NEW TEXT
+                self.votes[voted].append(voter)
 
             # update the talk list
             if type == 'talk': # then gather the text
@@ -281,11 +288,13 @@ class Villager(object):
             if len(self.mediums) == 1 and self.currentDay != 1:
                 self.likely_medium.add( next(iter(self.mediums.values())) )
                 self.likely_human.add( next(iter(self.mediums.values())) )
+                self.pt.setu(next(iter(self.mediums.values())), "MEDIUM", 1)
             
             # if only 1 seer CO that seer is trustworthy
             if len(self.seers) == 1 and self.currentDay != 1:
                 self.likely_seer.add( next(iter(self.seers.values())) )
                 self.likely_human.add( next(iter(self.seers.values())) )
+                self.pt.setu(next(iter(self.seers.values())), "SEER", 1)
 
             # those who div on day 1 WW are suspicous - 3/14 RNG
             if len(self.seers) > 1 and self.currentDay == 1:
@@ -293,6 +302,8 @@ class Villager(object):
                     if self.seers[sus] > 0:
                         self.likely_possessed.add(sus)
                         self.likely_werewolf.add(sus)
+                        self.pt.update(sus, "WEREWOLF", .5)
+                        self.pt.update(sus, "POSSESSED", .5)
             
             # seers who CO and were killed are deemed innocent, the others are suspicous
             if len(self.seers) > 1:
@@ -302,6 +313,8 @@ class Villager(object):
                         susSeers.pop(inno)
                         for sus in susSeers:
                             self.likely_werewolf.add(sus)
+                            self.pt.update(sus, "POSSESSED", .25)
+                            self.pt.update(sus, "WEREWOLF", .25)
 
             # if someone divined us as WW they are likely WW or POS
             if self.currentDay > 1 and self.role:
@@ -309,6 +322,54 @@ class Villager(object):
                     if self.divined[sus] == [self.idx, 'WEREWOLF']:
                         self.likely_werewolf.add(sus)
                         self.likely_possessed.add(sus)
+                        self.pt.update(sus, "POSSESSED", .5)
+                        self.pt.update(sus, "WEREWOLF", .5)
+
+            for player in self.killed:
+                self.likely_human.add(player)
+                self.pt.setu(player, "V/BG", 1)
+            
+            if self.currentDay == 1 and len(self.seers) == 2:
+                localSeers = list(self.seers.keys())
+                if self.seers(localSeers[0]) == self.seers(localSeers[1]):
+                    self.pt.setu(localSeers[0], "SEER", .5)
+                    self.pt.setu(localSeers[0], "POSSESSED", .25)
+                    self.pt.setu(localSeers[0], "WEREWOLF", .25)
+                    self.pt.setu(localSeers[1], "SEER", .5)
+                    self.pt.setu(localSeers[1], "POSSESSED", .25)
+                    self.pt.setu(localSeers[1], "WEREWOLF", .25)
+                elif self.seers(localSeers[0]) > 0: #0 divined the werewolf..
+                    self.pt.setu(localSeers[0], "SEER", 3/14)
+                    self.pt.setu(localSeers[0], "POSSESSED", (11/14)/2)
+                    self.pt.setu(localSeers[0], "WEREWOLF", (11/14)/2)
+                    self.pt.setu(localSeers[1], "SEER", 11/14)
+                    self.pt.setu(localSeers[1], "POSSESSED", (3/14)/2)
+                    self.pt.setu(localSeers[1], "WEREWOLF", (3/14)/2)
+                else: #1 divined the werewolf..
+                    self.pt.setu(localSeers[1], "SEER", 3/14)
+                    self.pt.setu(localSeers[1], "POSSESSED", (11/14)/2)
+                    self.pt.setu(localSeers[1], "WEREWOLF", (11/14)/2)
+                    self.pt.setu(localSeers[0], "SEER", 11/14)
+                    self.pt.setu(localSeers[0], "POSSESSED", (3/14)/2)
+                    self.pt.setu(localSeers[0], "WEREWOLF", (3/14)/2)
+                
+            for seer in self.divined:
+                if (self.divined[seer][0] in self.seers) and (self.divined[seer][1] == "WEREWOLF"):
+                    self.likely_possessed.add(seer)
+                    self.likely_werewolf.add(seer)
+                    self.pt.update(seer, "WEREWOLF", .2)
+                    self.pt.update(seer, "POSSESSED", .2)
+
+            if self.currentDay > 1:
+                for targ in self.prev_estimate_votes:
+                    if len(self.prev_estimate_votes[self.prev_voted_out]) - len(self.prev_estimate_votes[targ]) < 2 and targ in self.killed: #almost voted out and killed
+                        self.update(targ, "V/BG", .2)
+            
+            for player in self.votes:
+                pass
+
+
+
 
             # role specific identification (in other classes)
 
@@ -331,7 +392,9 @@ class Villager(object):
         # resets
         self.nthTalk = -1
         self.agent_talks = []
+        self.prev_estimate_votes = self.estimate_votes.copy()
         self.estimate_votes = {player: [] for player in self.alive}
+        self.votes = {player: [] for player in self.alive}
         self.repeatTalk = False
         self.unaccused = self.alive.copy()
         self.estimate = 0
