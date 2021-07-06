@@ -20,7 +20,11 @@ class Werewolf(grnVillager.Villager):
         self.medium_target = set()
         self.seer_target = set()
         self.bodyguard_target = set()
+        # the possessed that is confirmed by signaling
+        self.possessed = set()
         self.nthWhisper = -1
+        self.identify_possessed = False
+        self.fake_estimate_possessed = False
         self.daily_vote = True
         self.daily_estimate = True
         self.allyCOSeer = False
@@ -29,6 +33,8 @@ class Werewolf(grnVillager.Villager):
         self.ally_whispers = []
         self.allyProposedAttack = []
         self.grnAttack = -1
+        self.push_seer_vote = 0
+        self.daily_vote_claim = 0
 
 
     def update(self, base_info, diff_data, request):
@@ -94,22 +100,43 @@ class Werewolf(grnVillager.Villager):
 
             elif "ESTIMATE" in self.ally_whispers[self.nthTalk][2]:
                 pass
+            
+        # identify the possessed, true seer, true medium
+        # if len(self.possessed) == 0:
+        # in the case of a fake seer (most likely given past agent conventions):
+        for agent, divs in self.divined.items():
+            # false divine serves as signal
+            if ( divs[0] in self.WWs and divs[1] == 'HUMAN' ) or ( divs[0] in self.alive.difference(self.WWs) and divs[1] == 'WEREWOLF' ):
+                self.possessed.add(agent)
+                self.seer_target.difference(self.possessed)
+            elif divs[0] in self.WWs and divs[1] == 'WEREWOLF':
+                self.seer_target.add(agent)
+                self.possessed.difference(self.seer_target) # no overlap
+            else:
+                self.seer_target.add(agent)
+                self.possessed.difference(self.seer_target) # no overlap
 
-        # update ally alive status
+        # or in the case of a fake medium
+        for agent, ids in self.identified.items():
+            # false identification serves as signal
+            if ( ids[0] in self.WWs and ids[1] == 'HUMAN' ) or ( divs[0] in self.dead and divs[1] == 'WEREWOLF' ):
+                self.possessed.add(agent)
+            elif ids[0] in self.WWs and ids[1] == 'WEREWOLF':
+                self.medium_target.add(agent)
+
+         # update ally alive status
         for ally in self.WWs:
             if ally not in self.alive:
                 self.WWs.remove(ally)
         print('WEREWOLVES:')
         print(self.WWs)
 
-        #
-
-        #
-
         # heuristics
 
     def dayStart(self):
         super().dayStart()
+        self.push_seer_vote = 0
+        self.daily_vote_claim = 0
         self.nthWhisper = -1
         self.daily_vote = True
         self.daily_estimate = True
@@ -117,8 +144,34 @@ class Werewolf(grnVillager.Villager):
         self.attackVote = []
         self.allyProposedAttack = []
 
-    def talk(self): # new
-        return "Over"
+    def talk(self): # talk as villager with vested interest in aligning with fake seer 
+        # talk as a villager
+        # super.talk()
+
+        if self.currentDay < 2:
+            if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
+                    self.hasCO = True
+                    return cb.comingout(self.idx, self.idx, 'VILLAGER')
+            elif self.talkTurn < 7:
+                self.talkTurn += 1
+                # best case, the possessed has signaled day 1
+                if len(self.possessed) == 1:
+                    if self.divined[  list(self.possessed)[0]  ][self.currentDay - 1][1] == 'WEREWOLF':
+                        if not self.fake_estimate_possessed:
+                            self.fake_estimate_possessed = True
+                            return cb.estimate(self.idx, list(self.seer_target)[0], 'POSSESSED')
+                        elif self.daily_vote_claim < 4:
+                            self.daily_vote_claim += 1
+                            return cb.vote(self.idx, self.divined[ list(self.possessed)[0] ][self.currentDay - 1][0] )
+                elif list(self.seer_target)[0] in self.alive and self.push_seer_vote < 3:
+                    self.push_seer_vote += 1
+                    return cb.vote(self.idx, list(self.seer_target)[0])
+                else:
+                    return cb.skip()
+        if self.currentDay > 2:
+            pass
+        else:
+            pass
 
     def vote(self): # new
         logging.debug("# VOTE")
@@ -140,11 +193,15 @@ class Werewolf(grnVillager.Villager):
         else:
             return voteWW
 
-    def whisper(self): # new
+    def whisper(self): # attack and vote 
         print('WW Whisper reached') #
         if not self.hasCO:
             self.hasCO = True
             return cb.comingout(self.idx, self.idx, "VILLAGER")
+
+        if not self.identify_possessed:
+            self.identify_possessed = True
+            return cb.estimate(self.idx, list(self.possessed)[0], 'POSSESSED')
 
         if self.daily_vote:
             self.daily_vote = False
@@ -154,9 +211,8 @@ class Werewolf(grnVillager.Villager):
             elif self.currentDay < 3:
                 self.grnAttack = random.choice(list(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer)))
                 return cb.vote(self.idx, self.grnAttack)
-        
-        
-        return "Over"
+
+        return cb.over()
 
     def attack(self): # new
         print('WW Attack reached') #
