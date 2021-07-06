@@ -421,7 +421,7 @@ class Villager(object):
                             if self.seers[targ] > 0:
                                 return cb.vote(self.idx, targ)
                     else:
-                        cb.skip()
+                        return cb.skip()
                 else: return cb.over()
 
             # day 2 talk logic
