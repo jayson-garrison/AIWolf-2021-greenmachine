@@ -471,6 +471,50 @@ class Villager(object):
     # act based on the lists
     def vote(self):
         logging.debug("# VOTE")
+        self.pt.print()
+        max = -1
+        maxP = -1 #player with max value
+        second = -1
+
+        #first loop find max
+        for player in self.alive:
+            if self.pt.get(player, "WEREWOLF") > max:
+                max = self.pt.get(player, "WEREWOLF")
+                maxP = player
+
+            #remove if columns w & p merge
+            if self.pt.get(player, "POSSESSED") > max:
+                max = self.pt.get(player, "POSSESSED")
+                maxP = player
+        
+        #second loop find second max
+        for player in self.alive:
+            if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
+                second = self.pt.get(player, "WEREWOLF")
+
+            #remove if columns w & p merge
+            if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
+                second = self.pt.get(player, "POSSESSED")
+        
+        #finally compare and decide if voting in majority
+        
+        if max - second < .5 and self.currentDay < 4:
+            #if day num low and difference small, vote majority
+            majority = -1
+            majorityP = -1
+            for player in self.estimate_votes:
+                if len(self.estimate_votes[player]) > majority:
+                    majority = len(self.estimate_votes[player])
+                    majorityP = player
+            return majorityP
+
+        else:
+            #difference great or day num high enough to have sufficient data..
+            return maxP
+
+        '''
+        #OLD VOTE FUNCT
+        logging.debug("# VOTE")
         max = -1
         maxWW = -1
         voteWW = -1
@@ -487,6 +531,7 @@ class Villager(object):
 
         else:
             return voteWW
+        '''
 
     # Finish (no return)
     def finish(self):

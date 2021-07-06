@@ -28941,3 +28941,580 @@ Diff Data:
 12    8  finish   13     0     13   COMINGOUT Agent[13] VILLAGER
 13    8  finish   14     0     14     COMINGOUT Agent[14] MEDIUM
 14    8  finish   15     0     15   COMINGOUT Agent[15] WEREWOLF
+# INITIALIZE
+Game Setting:
+{
+  "enableNoAttack": false,
+  "enableNoExecution": false,
+  "enableRoleRequest": true,
+  "maxAttackRevote": 1,
+  "maxRevote": 1,
+  "maxSkip": 2,
+  "maxTalk": 10,
+  "maxTalkTurn": 20,
+  "maxWhisper": 10,
+  "maxWhisperTurn": 20,
+  "playerNum": 15,
+  "randomSeed": 3324976376081803898,
+  "roleNumMap": {
+    "POSSESSED": 1,
+    "WEREWOLF": 3,
+    "FREEMASON": 0,
+    "SEER": 1,
+    "ANY": 0,
+    "BODYGUARD": 1,
+    "VILLAGER": 8,
+    "FOX": 0,
+    "MEDIUM": 1
+  },
+  "talkOnFirstDay": false,
+  "timeLimit": -1,
+  "validateUtterance": true,
+  "votableInFirstDay": false,
+  "voteVisible": true,
+  "whisperBeforeRevote": false
+}
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+   day        type  idx  turn  agent                          text
+0    0  initialize    1     0      1  COMINGOUT Agent[01] VILLAGER
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# DAYSTART
+# UPDATE
+Request:
+DAILY_FINISH
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# DAYSTART
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent            text
+0    1  talk    0     0      3  VOTE Agent[15]
+# TALK
+# INITIALIZE
+Game Setting:
+{
+  "enableNoAttack": false,
+  "enableNoExecution": false,
+  "enableRoleRequest": true,
+  "maxAttackRevote": 1,
+  "maxRevote": 1,
+  "maxSkip": 2,
+  "maxTalk": 10,
+  "maxTalkTurn": 20,
+  "maxWhisper": 10,
+  "maxWhisperTurn": 20,
+  "playerNum": 15,
+  "randomSeed": 1324564086774667311,
+  "roleNumMap": {
+    "POSSESSED": 1,
+    "WEREWOLF": 3,
+    "FREEMASON": 0,
+    "SEER": 1,
+    "ANY": 0,
+    "BODYGUARD": 1,
+    "VILLAGER": 8,
+    "FOX": 0,
+    "MEDIUM": 1
+  },
+  "talkOnFirstDay": false,
+  "timeLimit": -1,
+  "validateUtterance": true,
+  "votableInFirstDay": false,
+  "voteVisible": true,
+  "whisperBeforeRevote": false
+}
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+   day        type  idx  turn  agent                          text
+0    0  initialize    1     0      1  COMINGOUT Agent[01] VILLAGER
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# DAYSTART
+# UPDATE
+Request:
+DAILY_FINISH
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 0,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# UPDATE
+Request:
+DAILY_INITIALIZE
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+Empty DataFrame
+Columns: [day, type, idx, turn, agent, text]
+Index: []
+# DAYSTART
+# UPDATE
+Request:
+TALK
+Base Info:
+{
+  "agentIdx": 1,
+  "myRole": "VILLAGER",
+  "roleMap": {
+    "1": "VILLAGER"
+  },
+  "day": 1,
+  "remainTalkMap": {
+    "1": 10,
+    "2": 10,
+    "3": 10,
+    "4": 10,
+    "5": 10,
+    "6": 10,
+    "7": 10,
+    "8": 10,
+    "9": 10,
+    "10": 10,
+    "11": 10,
+    "12": 10,
+    "13": 10,
+    "14": 10,
+    "15": 10
+  },
+  "remainWhisperMap": {},
+  "statusMap": {
+    "1": "ALIVE",
+    "2": "ALIVE",
+    "3": "ALIVE",
+    "4": "ALIVE",
+    "5": "ALIVE",
+    "6": "ALIVE",
+    "7": "ALIVE",
+    "8": "ALIVE",
+    "9": "ALIVE",
+    "10": "ALIVE",
+    "11": "ALIVE",
+    "12": "ALIVE",
+    "13": "ALIVE",
+    "14": "ALIVE",
+    "15": "ALIVE"
+  }
+}
+Diff Data:
+   day  type  idx  turn  agent                      text
+0    1  talk    0     0      8  COMINGOUT Agent[08] SEER
+1    1  talk    1     0     15  COMINGOUT Agent[15] SEER
+2    1  talk    2     0      5            VOTE Agent[14]
+3    1  talk    3     0      2            VOTE Agent[06]
+4    1  talk    4     0     10            VOTE Agent[13]
+5    1  talk    5     0     12            VOTE Agent[01]
+# TALK
