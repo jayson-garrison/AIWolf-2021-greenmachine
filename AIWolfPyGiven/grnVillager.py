@@ -355,6 +355,7 @@ class Villager(object):
                     self.pt.setu(localSeers[0], "POSSESSED", (3/14)/2)
                     self.pt.setu(localSeers[0], "WEREWOLF", (3/14)/2)
                 
+            #If a seer div the other as WW, increase p to be WW aligned as true seers do not need to divine the other fake seer as they know they are fake
             for seer in self.divined:
                 if (self.divined[seer][0] in self.seers) and (self.divined[seer][1] == "WEREWOLF"):
                     self.likely_possessed.add(seer)
@@ -362,13 +363,18 @@ class Villager(object):
                     self.pt.update(seer, "WEREWOLF", .2)
                     self.pt.update(seer, "POSSESSED", .2)
 
+            #An agent is killed who was almost executed p HU increase
             if self.currentDay > 1:
                 for targ in self.prev_estimate_votes:
                     if len(self.prev_estimate_votes[self.prev_voted_out]) - len(self.prev_estimate_votes[targ]) < 2 and targ in self.killed: #almost voted out and killed
                         self.update(targ, "V/BG", .2)
             
+            #An agent does not vote for who they say they were going to increase WW aligned
+            liars = []
             for player in self.votes:
                 pass
+                #liars.append( set(self.votes[player]).difference )
+
 
 
 
@@ -473,6 +479,50 @@ class Villager(object):
     # act based on the lists
     def vote(self):
         logging.debug("# VOTE")
+        self.pt.print()
+        max = -1
+        maxP = -1 #player with max value
+        second = -1
+
+        #first loop find max
+        for player in self.alive:
+            if self.pt.get(player, "WEREWOLF") > max:
+                max = self.pt.get(player, "WEREWOLF")
+                maxP = player
+
+            #remove if columns w & p merge
+            if self.pt.get(player, "POSSESSED") > max:
+                max = self.pt.get(player, "POSSESSED")
+                maxP = player
+        
+        #second loop find second max
+        for player in self.alive:
+            if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
+                second = self.pt.get(player, "WEREWOLF")
+
+            #remove if columns w & p merge
+            if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
+                second = self.pt.get(player, "POSSESSED")
+        
+        #finally compare and decide if voting in majority
+        
+        if max - second < .5 and self.currentDay < 4:
+            #if day num low and difference small, vote majority
+            majority = -1
+            majorityP = -1
+            for player in self.estimate_votes:
+                if len(self.estimate_votes[player]) > majority:
+                    majority = len(self.estimate_votes[player])
+                    majorityP = player
+            return majorityP
+
+        else:
+            #difference great or day num high enough to have sufficient data..
+            return maxP
+
+        '''
+        #OLD VOTE FUNCT
+        logging.debug("# VOTE")
         max = -1
         maxWW = -1
         voteWW = -1
@@ -489,6 +539,7 @@ class Villager(object):
 
         else:
             return voteWW
+        '''
 
     # Finish (no return)
     def finish(self):

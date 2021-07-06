@@ -80,8 +80,14 @@ class CheatCodes(object):
     def setu(self, player, columnName, value):
         incrimentVal = value - self.get(player, columnName)
         return self.update(player, columnName, incrimentVal)
-    
 
+    def print(self):
+        print('------- Cheat Codes Table -------')
+        for i in self.table:
+            print(i) 
+        print('---------------------------------')
+    
+'''
 inst = CheatCodes({"POSSESSED":1, "WEREWOLF":3, "S/M":2})
 for i in inst.table:
     print(i) 
@@ -89,3 +95,6 @@ print('--------------')
 inst.setu(2, "POSSESSED", 1)
 for i in inst.table:
     print(i) 
+print("howdy")
+inst.print()
+'''
