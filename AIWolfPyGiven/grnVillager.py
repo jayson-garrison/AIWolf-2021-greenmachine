@@ -180,12 +180,14 @@ class Villager(object):
         # for new talks do:
         #endPos = len(self.agent_talks)
         while self.nthTalk < len(self.agent_talks) and not len(self.agent_talks) == 0:
-
+            
             self.nthTalk += 1
             print( 'nth talk' + str(self.nthTalk) )
-
+            # never take a man's word
+            if 'BECAUSE' or 'XOR' or 'OR' or 'AND' or 'REQUEST' or 'ESTIMATE' or 'DAY' or 'INQUIRE' or 'ATTACKED' or 'VOTED' in self.agent_talks[self.nthTalk][2]:
+                pass
             # agent 0
-            if "VOTE" in self.agent_talks[self.nthTalk][2]:
+            elif "VOTE" in self.agent_talks[self.nthTalk][2]:
                 print('reached VOTE')
                 voter = self.agent_talks[self.nthTalk][1]
                 voted = int( self.agent_talks[self.nthTalk][2][11:13] )

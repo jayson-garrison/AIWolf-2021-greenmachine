@@ -39,11 +39,47 @@ class Werewolf(grnVillager.Villager):
 
     def update(self, base_info, diff_data, request):
         super().update(base_info, diff_data, request)
-        print('$$$$$$$$$ WW WHISPERS $$$$$$$$$') #
-        print(self.ally_whispers)
-        # secondary reset
-        # if not (self.currentDay == int( self.base_info['day']) ):
-            # pass
+        print('----------WW UPDATE----------')
+        # print('$$$$$$$$$ WW WHISPERS $$$$$$$$$') #
+        # print(self.ally_whispers)
+
+        # identify the possessed, true seer, true medium
+        # if len(self.possessed) == 0:
+        # in the case of a fake seer (most likely given past agent conventions):
+        print('ANALYZE DIVS')
+        print(self.divined)
+        # for agent, divs in self.divined.items():
+        #     # false divine serves as signal
+        #     if ( divs[0] in self.WWs and divs[1] == 'HUMAN' ) or ( divs[0] in self.alive.difference(self.WWs) and divs[1] == 'WEREWOLF' ):
+        #         print('REACHED POS CASE 1')
+        #         self.possessed.add(agent)
+        #         self.seer_target.difference(self.possessed)
+        #     elif divs[0] in self.WWs and divs[1] == 'WEREWOLF':
+        #         print('REACHED POS CASE 2')
+        #         self.seer_target.add(agent)
+        #         self.possessed.difference(self.seer_target) # no overlap
+        #     else:
+        #         print('REACHED POS CASE 3')
+        #         self.seer_target.add(agent)
+        #         self.possessed.difference(self.seer_target) # no overlap
+
+        print('@@SEER TARGET@@' + str(self.seer_target) )
+        print('@@POSSESSED@@' + str(self.possessed) )
+
+        # or in the case of a fake medium
+        # for agent, ids in self.identified.items():
+        #     # false identification serves as signal
+        #     if ( ids[0] in self.WWs and ids[1] == 'HUMAN' ) or ( divs[0] in self.dead and divs[1] == 'WEREWOLF' ):
+        #         self.possessed.add(agent)
+        #     elif ids[0] in self.WWs and ids[1] == 'WEREWOLF':
+        #         self.medium_target.add(agent)
+
+         # update ally alive status
+        for ally in self.WWs:
+            if ally not in self.alive:
+                self.WWs.remove(ally)
+        print('WEREWOLVES:')
+        print(self.WWs)
             
         # parse whisper
         if request == 'WHISPER':
@@ -101,39 +137,8 @@ class Werewolf(grnVillager.Villager):
             elif "ESTIMATE" in self.ally_whispers[self.nthTalk][2]:
                 pass
             
-        # identify the possessed, true seer, true medium
-        # if len(self.possessed) == 0:
-        # in the case of a fake seer (most likely given past agent conventions):
-        for agent, divs in self.divined.items():
-            # false divine serves as signal
-            if ( divs[0] in self.WWs and divs[1] == 'HUMAN' ) or ( divs[0] in self.alive.difference(self.WWs) and divs[1] == 'WEREWOLF' ):
-                self.possessed.add(agent)
-                self.seer_target.difference(self.possessed)
-            elif divs[0] in self.WWs and divs[1] == 'WEREWOLF':
-                self.seer_target.add(agent)
-                self.possessed.difference(self.seer_target) # no overlap
-            else:
-                self.seer_target.add(agent)
-                self.possessed.difference(self.seer_target) # no overlap
-
-        print('@@SEER TARGET@@' + self.seer_target)
-        print('@@POSSESSED@@' + self.possessed)
-
-        # or in the case of a fake medium
-        for agent, ids in self.identified.items():
-            # false identification serves as signal
-            if ( ids[0] in self.WWs and ids[1] == 'HUMAN' ) or ( divs[0] in self.dead and divs[1] == 'WEREWOLF' ):
-                self.possessed.add(agent)
-            elif ids[0] in self.WWs and ids[1] == 'WEREWOLF':
-                self.medium_target.add(agent)
-
-         # update ally alive status
-        for ally in self.WWs:
-            if ally not in self.alive:
-                self.WWs.remove(ally)
-        print('WEREWOLVES:')
-        print(self.WWs)
-
+        
+        print('----------WW UPDATE END----------')
         # heuristics
 
     def dayStart(self):
