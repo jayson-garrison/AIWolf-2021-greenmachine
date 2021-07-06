@@ -353,6 +353,7 @@ class Villager(object):
                     self.pt.setu(localSeers[0], "POSSESSED", (3/14)/2)
                     self.pt.setu(localSeers[0], "WEREWOLF", (3/14)/2)
                 
+            #If a seer div the other as WW, increase p to be WW aligned as true seers do not need to divine the other fake seer as they know they are fake
             for seer in self.divined:
                 if (self.divined[seer][0] in self.seers) and (self.divined[seer][1] == "WEREWOLF"):
                     self.likely_possessed.add(seer)
@@ -360,13 +361,18 @@ class Villager(object):
                     self.pt.update(seer, "WEREWOLF", .2)
                     self.pt.update(seer, "POSSESSED", .2)
 
+            #An agent is killed who was almost executed p HU increase
             if self.currentDay > 1:
                 for targ in self.prev_estimate_votes:
                     if len(self.prev_estimate_votes[self.prev_voted_out]) - len(self.prev_estimate_votes[targ]) < 2 and targ in self.killed: #almost voted out and killed
                         self.update(targ, "V/BG", .2)
             
+            #An agent does not vote for who they say they were going to increase WW aligned
+            liars = []
             for player in self.votes:
                 pass
+                #liars.append( set(self.votes[player]).difference )
+
 
 
 
