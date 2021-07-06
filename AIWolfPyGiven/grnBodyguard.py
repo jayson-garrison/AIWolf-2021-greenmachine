@@ -4,6 +4,7 @@
 """
 import aiwolfpy
 from aiwolfpy import contentbuilder as cb
+import random
 import grnVillager
 
 class BodyGuard(grnVillager.Villager):
@@ -29,7 +30,9 @@ class BodyGuard(grnVillager.Villager):
         pass
 
     def guard(self):
-        return 1
+        if self.mediums.keys():
+            return int(random.choice(list(self.mediums.keys())))
+        return int(random.sample(self.alive, 1)[0])
 
     def whisper(self):
         return "Over"

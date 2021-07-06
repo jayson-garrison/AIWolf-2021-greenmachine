@@ -1,4 +1,4 @@
-from aiwolfpy import contentbuilder as cb
-
-a = cb.test
-print(a())
+import random
+a = {"HI", "A", "b", "c"}
+print(random.sample(a, 1)[0])
+print(random.choice(list(a)))
