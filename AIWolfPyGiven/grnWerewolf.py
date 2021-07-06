@@ -116,6 +116,9 @@ class Werewolf(grnVillager.Villager):
                 self.seer_target.add(agent)
                 self.possessed.difference(self.seer_target) # no overlap
 
+        print('@@SEER TARGET@@' + self.seer_target)
+        print('@@POSSESSED@@' + self.possessed)
+
         # or in the case of a fake medium
         for agent, ids in self.identified.items():
             # false identification serves as signal
@@ -147,13 +150,14 @@ class Werewolf(grnVillager.Villager):
     def talk(self): # talk as villager with vested interest in aligning with fake seer 
         # talk as a villager
         # super.talk()
+        self.talkTurn += 1
 
-        if self.currentDay < 2:
+        if self.currentDay < 3:
             if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
                     self.hasCO = True
                     return cb.comingout(self.idx, self.idx, 'VILLAGER')
             elif self.talkTurn < 7:
-                self.talkTurn += 1
+                # self.talkTurn += 1
                 # best case, the possessed has signaled day 1
                 if len(self.possessed) == 1:
                     if self.divined[  list(self.possessed)[0]  ][self.currentDay - 1][1] == 'WEREWOLF':
@@ -168,10 +172,10 @@ class Werewolf(grnVillager.Villager):
                     return cb.vote(self.idx, list(self.seer_target)[0])
                 else:
                     return cb.skip()
-        if self.currentDay > 2:
-            pass
+        if self.currentDay > 3:
+            return cb.over()
         else:
-            pass
+            return cb.over()
 
     def vote(self): # new
         logging.debug("# VOTE")
@@ -217,7 +221,7 @@ class Werewolf(grnVillager.Villager):
     def attack(self): # new
         print('WW Attack reached') #
         return self.grnAttack
-        # return cb.attack(self.idx, self.grnAttack)
+        
 
     def finish(self):
         return super().finish()
