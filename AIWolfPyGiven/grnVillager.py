@@ -194,9 +194,9 @@ class Villager(object):
                 print('reached VOTE')
                 voter = self.agent_talks[self.nthTalk][1]
                 voted = int( self.agent_talks[self.nthTalk][2][11:13] )
-                # for key_voted in self.estimate_votes:
-                #     if voter in self.estimate_votes[key_voted]:
-                #         self.estimate_votes[key_voted].popitem(voter)
+                for key_voted in self.estimate_votes:
+                    if voter in self.estimate_votes[key_voted]:
+                        self.estimate_votes[key_voted].popitem(voter)
                 self.estimate_votes[voted].add(voter)
                 print(self.estimate_votes) #
 
@@ -322,7 +322,7 @@ class Villager(object):
                             self.pt.update(sus, "WEREWOLF", .25)
 
             # if someone divined us as WW they are likely WW or POS
-            if self.currentDay > 1 and self.role:
+            if self.currentDay > 1 and self.role == "VILLAGER":
                 for sus in self.divined:
                     if self.divined[sus] == [self.idx, 'WEREWOLF']:
                         self.likely_werewolf.add(sus)
@@ -373,11 +373,42 @@ class Villager(object):
                         self.update(targ, "V/BG", .2)
             
             #An agent does not vote for who they say they were going to increase WW aligned
-            liars = []
+            #take union of each player estimate and votes
+            liarList = [] 
             for player in self.votes:
-                pass
-                #liars.append( set(self.votes[player]).difference )
+                liarUnion = self.votes[player].union(self.estimate_votes[player])
+                liarList.append(list(liarUnion))
+            liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
+            for liar in liarDuplicates:
+                self.pt.update(liar, "WEREWOLF", .15)
+                self.pt.update(liar, "POSSESSED", .15)
 
+            #A seer is killed, likely true seer, earlier in the game is more uncertain
+            for seer in self.seers:
+                if seer in self.killed:
+                    if self.currentDay > 3:
+                        self.pt.update(liar, "SEER", .5)
+                    else: #early game
+                        self.pt.update(liar, "SEER", .2)
+                    
+                    if len(self.seers == 2): #other seer sus
+                        self.pt.update(next(iter(set(self.seers.keys()).difference({liar}))), "POSSESSED", .35)
+            
+            #A medium is killed/executed, likely true medium
+            for medium in self.mediums:
+                if (medium in self.killed) or (medium in self.executed):
+                    self.pt.update(medium, "MEDIUM", .5)
+            
+            #An agent votes for an accepted medium or seer, likely WW
+            for player in self.alive:
+                for medium in self.likely_medium:
+                    if player in self.votes[medium]:
+                        self.pt.update(liar, "WEREWOLF", .2)
+                        self.pt.update(liar, "POSSESSED", .2)
+                for seer in self.likely_seer:
+                    if player in self.votes[seer]:
+                        self.pt.update(liar, "WEREWOLF", .2)
+                        self.pt.update(liar, "POSSESSED", .2)
 
 
 
@@ -422,6 +453,7 @@ class Villager(object):
 
             # day 1 talking logic
             if int(self.base_info['day']) == 1:
+                #return cb.skip()
                 # 30% CO Villager
                 if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
                     self.hasCO = True
@@ -431,12 +463,14 @@ class Villager(object):
                         for targ in self.seers:
                             if self.seers[targ] > 0:
                                 return cb.vote(self.idx, targ)
+                        return cb.skip()
                     else:
                         return cb.skip()
                 else: return cb.over()
 
             # day 2 talk logic
-            if int(self.base_info['day']) == 2:
+            elif int(self.base_info['day']) == 2:
+                #return cb.skip()
                 if len(self.seers) > 1:
                     for targ in self.seers:
                         if self.seers[targ] > 0 and targ in self.unaccused:
@@ -444,21 +478,25 @@ class Villager(object):
                             self.likely_werewolf.add(targ)
                             self.will_vote.append(targ)
                             return cb.logicalxor(self.idx, cb.estimate(self.idx, targ, "POSSESSED"), cb.estimate(self.idx, targ, "WEREWOLF"))
+                    return cb.skip()
                 elif len(self.seers) == 1 and next(iter(self.seers.values())) in self.unaccused:
                     self.unaccused.remove(next(iter(self.seers.values())))
                     self.likely_human.add(next(iter(self.seers.values())))
                     return cb.estimate(self.idx, next(iter(self.seers.values())), "SEER")
                 else:
                     return cb.skip()
+                
                     
             # late game logic
-            if int(self.base_info['day']) > 2:
+            #if int(self.base_info['day']) > 2:
+            else:
                 # if only one medium then estimate true medium 
                 if len(self.likely_medium) == 1:
                     if self.true_medium_state == 0:
                         self.true_medium_state += 1
                         return cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' )
-                    if self.true_medium_state == 1:
+                    #if self.true_medium_state == 1:
+                    else:
                         self.repeatMediumLogic += 1
                         return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' ), cb.comingout(list(self.likely_medium)[0], list(self.likely_medium)[0], 'MEDIUM') )
                 # if only one seer then estimate true seer
@@ -466,7 +504,8 @@ class Villager(object):
                     if self.true_seer_state == 0:
                         self.true_seer_state += 1
                         return cb.estimate(self.idx, list(self.likely_seer)[0], 'SEER' )
-                    if self.true_seer_state == 1:
+                    #if self.true_seer_state == 1:
+                    else:
                         self.true_seer_state += 1
                         return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_seer[0], 'SEER' )), cb.comingout(list(self.likely_seer)[0], list(self.likely_medium)[0], 'SEER') )
                 # claim to vote someone, need probTable

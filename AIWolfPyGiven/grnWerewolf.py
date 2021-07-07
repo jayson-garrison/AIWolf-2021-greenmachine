@@ -165,13 +165,13 @@ class Werewolf(grnVillager.Villager):
                 # self.talkTurn += 1
                 # best case, the possessed has signaled day 1
                 if len(self.possessed) == 1:
-                    if self.divined[  list(self.possessed)[0]  ][self.currentDay - 1][1] == 'WEREWOLF':
-                        if not self.fake_estimate_possessed:
-                            self.fake_estimate_possessed = True
-                            return cb.estimate(self.idx, list(self.seer_target)[0], 'POSSESSED')
-                        elif self.daily_vote_claim < 4:
-                            self.daily_vote_claim += 1
-                            return cb.vote(self.idx, self.divined[ list(self.possessed)[0] ][self.currentDay - 1][0] )
+                    #if self.divined[  list(self.possessed)[0]  ][-1][1] == 'WEREWOLF':
+                    if not self.fake_estimate_possessed:
+                        self.fake_estimate_possessed = True
+                        return cb.estimate(self.idx, list(self.seer_target)[0], 'POSSESSED')
+                    elif self.daily_vote_claim < 4:
+                        self.daily_vote_claim += 1
+                        return cb.vote(self.idx, self.divined[ list(self.possessed)[0] ][-1][0] )
                 elif list(self.seer_target)[0] in self.alive and self.push_seer_vote < 3:
                     self.push_seer_vote += 1
                     return cb.vote(self.idx, list(self.seer_target)[0])
