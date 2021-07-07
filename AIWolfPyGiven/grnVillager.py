@@ -100,6 +100,8 @@ class Villager(object):
         # format:
         # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
+        # never take a man's word
+        self.forbidden = ['OR', 'XOR', 'NOT', 'BECAUSE', 'AND', 'SKIP', 'OVER', 'REQUEST', 'INQUIRE', 'DAY', 'VOTED', 'ATTACKED', 'AGREE', 'DISAGREE']
         # counting votes 
         self.estimate_votes = {player: [] for player in self.alive}
         # keeping track of temp info
@@ -172,7 +174,8 @@ class Villager(object):
 
             # update the talk list
             if type == 'talk': # then gather the text
-                if not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+                #if not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
+                if not any(phrase in text.upper() for phrase in self.forbidden):
                     talkList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
                     self.agent_talks.append(talkList)
                     print('new talks')
@@ -184,10 +187,10 @@ class Villager(object):
             self.nthTalk += 1
             print( 'nth talk' + str(self.nthTalk) )
             # never take a man's word
-            if 'BECAUSE' or 'XOR' or 'OR' or 'AND' or 'REQUEST' or 'ESTIMATE' or 'DAY' or 'INQUIRE' or 'ATTACKED' or 'VOTED' in self.agent_talks[self.nthTalk][2]:
-                pass
+            # if 'BECAUSE' or 'XOR' or 'OR' or 'AND' or 'REQUEST' or 'ESTIMATE' or 'DAY' or 'INQUIRE' or 'ATTACKED' or 'VOTED' in self.agent_talks[self.nthTalk][2]:
+            #     pass
             # agent 0
-            elif "VOTE" in self.agent_talks[self.nthTalk][2]:
+            if "VOTE" in self.agent_talks[self.nthTalk][2]:
                 print('reached VOTE')
                 voter = self.agent_talks[self.nthTalk][1]
                 voted = int( self.agent_talks[self.nthTalk][2][11:13] )
