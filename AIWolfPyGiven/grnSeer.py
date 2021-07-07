@@ -124,7 +124,7 @@ class Seer(grnVillager.Villager):
             elif not ( self.daily_div_claim ): # self.divined_WW_day_0 and 
                 # print('CASE 2 REACHED: DIV ONLY HUs REPORT ONE')
                 self.daily_div_claim = True
-                return cb.divined(self.idx, list(self.divHU)[0], 'HUMAN') # div 2 WW in day 0 and 1; this is from day 0
+                return cb.divined(self.idx, list(self.divHU)[-1], 'HUMAN') # div 2 WW in day 0 and 1; this is from day 0
             # cont case 1, push vote WW
             elif self.daily_div_claim and self.daily_push_vote < 2 and self.div_WW_today:
                 # print('CASE 3 REACHED: PUSH VOTE WW DIV')
