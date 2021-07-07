@@ -101,7 +101,7 @@ class Villager(object):
         # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
         # counting votes 
-        self.estimate_votes = {player: [] for player in self.alive}
+        self.estimate_votes = {player: set() for player in self.alive}
         # keeping track of temp info
         self.nthTalk = -1
         self.currentDay = -1
@@ -116,9 +116,9 @@ class Villager(object):
         self.true_seer_state = 0
         self.daily_push_vote = 0
         self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
-        self.prev_estimate_votes = {player: [] for player in self.alive}
+        self.prev_estimate_votes = {player: set() for player in self.alive}
         self.prev_voted_out = -1
-        self.votes = {player: [] for player in self.alive}
+        self.votes = {player: set() for player in self.alive}
 
 
     # new information (no return)
@@ -168,7 +168,7 @@ class Villager(object):
             if type == 'vote': # then...
                 voter = int(getattr(row, 'agent'))
                 voted = text[11:13] # UPDATE WITH NEW TEXT
-                self.votes[voted].append(voter)
+                self.votes[voted].add(voter)
 
             # update the talk list
             if type == 'talk': # then gather the text
@@ -191,10 +191,10 @@ class Villager(object):
                 print('reached VOTE')
                 voter = self.agent_talks[self.nthTalk][1]
                 voted = int( self.agent_talks[self.nthTalk][2][11:13] )
-                for key_voted in self.estimate_votes:
-                    if voter in self.estimate_votes[key_voted]:
-                        self.estimate_votes[key_voted].remove(voter)
-                self.estimate_votes[voted].append(voter)
+                # for key_voted in self.estimate_votes:
+                #     if voter in self.estimate_votes[key_voted]:
+                #         self.estimate_votes[key_voted].popitem(voter)
+                self.estimate_votes[voted].add(voter)
                 print(self.estimate_votes) #
 
             elif "COMINGOUT" in self.agent_talks[self.nthTalk][2]:
@@ -401,8 +401,8 @@ class Villager(object):
         self.nthTalk = -1
         self.agent_talks = []
         self.prev_estimate_votes = self.estimate_votes.copy()
-        self.estimate_votes = {player: [] for player in self.alive}
-        self.votes = {player: [] for player in self.alive}
+        self.estimate_votes = {player: set() for player in self.alive}
+        self.votes = {player: set() for player in self.alive}
         self.repeatTalk = False
         self.unaccused = self.alive.copy()
         self.estimate = 0
