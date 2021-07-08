@@ -140,6 +140,8 @@ class Werewolf(grnVillager.Villager):
         
         print('----------WW UPDATE END----------')
         # heuristics
+        for ww in self.WWs:
+            self.pt.setu(ww, "WEREWOLF", 1)
 
     def dayStart(self):
         super().dayStart()

@@ -67,9 +67,9 @@ class Villager(object):
         self.COs = {player: set() for player in self.alive} 
         # players who voted for me
         self.votedme = set() 
-        #everyone who said they divined someone, paired with who they divined
+        #everyone who said they divined someone, paired with [who they divined, human/werewolf]
         self.divined = dict() 
-        #everyone who said they identified someone, paired with who they identified
+        #everyone who said they identified someone, paired with [who they identified, human/werewolf]
         self.identified = dict() 
         #self.initialized_broadcasts = set()
         # when our own data is not needed
@@ -121,6 +121,8 @@ class Villager(object):
         self.prev_estimate_votes = {player: set() for player in self.alive}
         self.prev_voted_out = -1
         self.votes = {player: set() for player in self.alive}
+        self.prev_votes = {player: set() for player in self.alive}
+        self.prev_dead = -1
 
 
     # new information (no return)
@@ -165,6 +167,7 @@ class Villager(object):
                 self.killed.add( int(getattr(row, 'agent')) )
                 self.dead.add( int(getattr(row, 'agent')) )
                 self.alive.remove( int(getattr(row, 'agent')) )
+                self.prev_dead = int(getattr(row, 'agent'))
 
             # update voting 
             if type == 'vote': # then...
@@ -289,6 +292,8 @@ class Villager(object):
             '''
             # estimate roles
 
+            self.pt.setu(self.idx, "V/BG", 1)
+
             # if only 1 medium CO that medium is trustworthy
             if len(self.mediums) == 1 and self.currentDay != 1:
                 self.likely_medium.add( next(iter(self.mediums.values())) )
@@ -410,6 +415,21 @@ class Villager(object):
                         self.pt.update(liar, "WEREWOLF", .2)
                         self.pt.update(liar, "POSSESSED", .2)
 
+                
+            #An agent votes for someone who was executed next round
+            for voter in self.prev_votes[self.prev_dead]:
+                self.pt.update(voter, "POSSESSED", .3)
+                self.pt.update(voter, "WEREWOLF", .3)
+
+            
+            #A seer divines a werewolf as human (werewolf status declared by medium)
+            for seer in self.divined:
+                for seerPair in  self.divined[seer]:
+                    for medium in self.identified:
+                        for mediumPair in self.identified[medium]:
+                            if seerPair[0] == mediumPair[0] and seerPair[1] != mediumPair[1]: #same name different identities
+                                self.pt.setu(seer, "POSSESSED", .5)
+                                self.pt.setu(seer, "WEREWOLF", .5) 
 
 
 
@@ -437,6 +457,7 @@ class Villager(object):
         self.prev_estimate_votes = self.estimate_votes.copy()
         self.estimate_votes = {player: set() for player in self.alive}
         self.votes = {player: set() for player in self.alive}
+        self.prev_votes = self.votes.copy()
         self.repeatTalk = False
         self.unaccused = self.alive.copy()
         self.estimate = 0
