@@ -161,19 +161,19 @@ class Villager(object):
                 self.prev_voted_out = int(getattr(row, 'agent'))
 
             # update dead players
-            if type == 'dead':
+            elif type == 'dead':
                 self.killed.add( int(getattr(row, 'agent')) )
                 self.dead.add( int(getattr(row, 'agent')) )
                 self.alive.remove( int(getattr(row, 'agent')) )
 
             # update voting 
-            if type == 'vote': # then...
+            elif type == 'vote': # then...
                 voter = int(getattr(row, 'agent'))
                 voted = text[11:13] # UPDATE WITH NEW TEXT
                 self.votes[voted].append(voter)
 
             # update the talk list
-            if type == 'talk': # then gather the text
+            elif type == 'talk': # then gather the text
                 #if not ('SKIP' in text.upper() or 'OVER' in text.upper() ):
                 if not any(phrase in text.upper() for phrase in self.forbidden):
                     talkList = [int(getattr(row, 'turn')), int( getattr(row, 'agent') ) , str(text) ]
@@ -390,8 +390,7 @@ class Villager(object):
         # keep track of number of times we have talked today 
         self.talkTurn = 0 
         logging.debug("# DAYSTART")
-        print('----------------------------------REACHED RESET----------------------------------') #
-        print('ALIVE:') #
+        print('----------------------------------REACHED RESET---------------------------------- CURRENT DAY: ' + str(self.currentDay)) 
         print(self.alive) #
         print('DEAD:') #
         print(self.dead) #
