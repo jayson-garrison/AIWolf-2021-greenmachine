@@ -48,31 +48,33 @@ class Werewolf(grnVillager.Villager):
         # in the case of a fake seer (most likely given past agent conventions):
         print('ANALYZE DIVS')
         print(self.divined)
-        # for agent, divs in self.divined.items():
-        #     # false divine serves as signal
-        #     if ( divs[0] in self.WWs and divs[1] == 'HUMAN' ) or ( divs[0] in self.alive.difference(self.WWs) and divs[1] == 'WEREWOLF' ):
-        #         print('REACHED POS CASE 1')
-        #         self.possessed.add(agent)
-        #         self.seer_target.difference(self.possessed)
-        #     elif divs[0] in self.WWs and divs[1] == 'WEREWOLF':
-        #         print('REACHED POS CASE 2')
-        #         self.seer_target.add(agent)
-        #         self.possessed.difference(self.seer_target) # no overlap
-        #     else:
-        #         print('REACHED POS CASE 3')
-        #         self.seer_target.add(agent)
-        #         self.possessed.difference(self.seer_target) # no overlap
+        for agent, divs in self.divined.items():
+            # false divine serves as signal
+            if agent not in self.WWs and (( divs[0] in self.WWs and divs[1] == 'HUMAN' ) or ( divs[0] in self.alive.difference(self.WWs) and divs[1] == 'WEREWOLF' )):
+                print('REACHED POS CASE 1')
+                self.possessed.add(agent)
+                self.seer_target = self.seer_target.difference(self.possessed).difference(self.WWs)
+            # elif divs[0] in self.WWs and divs[1] == 'WEREWOLF':
+            #     print('REACHED POS CASE 2')
+            #     self.seer_target.add(agent)
+            #     self.possessed.difference(self.seer_target) # no overlap
+            else:
+                print('REACHED POS CASE 3')
+                self.seer_target.add(agent)
+                self.possessed = self.possessed.difference(self.seer_target) # no overlap
 
         print('@@SEER TARGET@@' + str(self.seer_target) )
         print('@@POSSESSED@@' + str(self.possessed) )
 
         # or in the case of a fake medium
-        # for agent, ids in self.identified.items():
-        #     # false identification serves as signal
-        #     if ( ids[0] in self.WWs and ids[1] == 'HUMAN' ) or ( divs[0] in self.dead and divs[1] == 'WEREWOLF' ):
-        #         self.possessed.add(agent)
-        #     elif ids[0] in self.WWs and ids[1] == 'WEREWOLF':
-        #         self.medium_target.add(agent)
+        for agent, ids in self.identified.items():
+            # false identification serves as signal
+            if agent not in self.WWs and (( ids[0] in self.WWs and ids[1] == 'HUMAN' ) or ( divs[0] in self.dead and divs[1] == 'WEREWOLF' )):
+                self.possessed.add(agent)
+                self.medium_target = self.medium_target.difference(self.possessed).difference(self.WWs)
+            #elif ids[0] in self.WWs and ids[1] == 'WEREWOLF':'
+            else:
+                self.medium_target.add(agent)
 
          # update ally alive status
         for ally in self.WWs:
@@ -186,23 +188,46 @@ class Werewolf(grnVillager.Villager):
 
     def vote(self): # new
         logging.debug("# VOTE")
+        self.pt.print()
         max = -1
-        maxWW = -1
-        vote = -1
-        voteWW = -1
+        maxP = -1 #player with max value
+        second = -1
+
+        #first loop find max
+        for player in self.alive.difference(self.WWs):
+            if self.pt.get(player, "WEREWOLF") > max:
+                max = self.pt.get(player, "WEREWOLF")
+                maxP = player
+
+            #remove if columns w & p merge
+            if self.pt.get(player, "POSSESSED") > max:
+                max = self.pt.get(player, "POSSESSED")
+                maxP = player
         
-        for player in self.estimate_votes:
-            if len(self.estimate_votes[player]) > max and player not in self.WWs: #debug try "and not (player in self.WWs)"
-                max = len(self.estimate_votes[player])
-                vote = player
-                if player in self.alive.union(self.likely_werewolf):
-                    maxWW = len(self.estimate_votes[player])
-                    voteWW = player
-        if vote in self.likely_werewolf or self.currentDay < 4:
-            return vote
+        #second loop find second max
+        for player in self.alive.difference(self.WWs):
+            if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
+                second = self.pt.get(player, "WEREWOLF")
+
+            #remove if columns w & p merge
+            if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
+                second = self.pt.get(player, "POSSESSED")
+        
+        #finally compare and decide if voting in majority
+        
+        if max - second < .5 and self.currentDay < 4:
+            #if day num low and difference small, vote majority
+            majority = -1
+            majorityP = -1
+            for player in self.estimate_votes:
+                if len(self.estimate_votes[player]) > majority and player not in self.WWs:
+                    majority = len(self.estimate_votes[player])
+                    majorityP = player
+            return majorityP
 
         else:
-            return voteWW
+            #difference great or day num high enough to have sufficient data..
+            return maxP
 
     def whisper(self): # attack and vote 
         print('WW Whisper reached') #
@@ -214,13 +239,18 @@ class Werewolf(grnVillager.Villager):
             self.identify_possessed = True
             return cb.estimate(self.idx, list(self.possessed)[0], 'POSSESSED')
 
-        if self.daily_vote:
+        if self.daily_vote and self.currentDay > 1:
             self.daily_vote = False
             if len(self.attackVote) > 1:
                 self.grnAttack = self.attackVote[0][1]
                 return cb.vote(self.idx, self.grnAttack)
-            elif self.currentDay < 3:
-                self.grnAttack = random.choice(list(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer)))
+            else:
+                if len(self.likely_medium) > 0 and random.randint(0,1) == 0: 
+                    self.grnAttack = next(iter(self.likely_medium))
+                if len(self.likely_seer) > 0 and random.randint(0,1) == 0: 
+                    self.grnAttack = next(iter(self.likely_seer))
+                else:
+                    self.grnAttack = random.choice(list(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer)))
                 return cb.vote(self.idx, self.grnAttack)
 
         return cb.over()

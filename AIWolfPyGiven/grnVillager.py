@@ -294,8 +294,8 @@ class Villager(object):
                 pass
             '''
         # estimate roles
-
-        self.pt.setu(self.idx, "V/BG", 1)
+        if self.role == "VILLAGER":
+            self.pt.setu(self.idx, "V/BG", 1)
 
         # if only 1 medium CO that medium is trustworthy
         if len(self.mediums) == 1 and self.currentDay != 1:
