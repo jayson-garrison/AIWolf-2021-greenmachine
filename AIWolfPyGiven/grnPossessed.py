@@ -38,6 +38,7 @@ class Possessed(grnVillager.Villager):
             
         #heuristics:
         #no one else can be possessed
+        self.pt.setu(self.idx, "POSSESSED", 1)
 
     def dayStart(self):
         super().dayStart()

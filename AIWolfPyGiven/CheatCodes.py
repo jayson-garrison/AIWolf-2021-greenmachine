@@ -83,6 +83,7 @@ class CheatCodes(object):
 
     def print(self):
         print('------- Cheat Codes Table -------')
+        print(self.labels)
         for i in self.table:
             print(i) 
         print('---------------------------------')
