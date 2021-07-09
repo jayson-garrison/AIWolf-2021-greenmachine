@@ -1,4 +1,11 @@
 
+'''
+Contains Villager Class
+07/'21
+James Hale
+Jayson C. Garrison
+Grey Bodi
+'''
 #!/usr/bin/env python
 from __future__ import print_function, division
 
@@ -75,7 +82,7 @@ class Villager(object):
         self.executed = set()
         # make sure executed + killed = dead
         self.killed = set() 
-        self.seers = dict()
+        self.seers = dict() # key: seer, value: an integer cooresponding to how any werewolf divines there are
         self.mediums = dict()
         self.bodyguards = set()
         self.likely_human = set()
@@ -92,14 +99,21 @@ class Villager(object):
         # format:
         # [ [0: turn, 1: agent, 2: text] ]
         self.agent_talks = [] 
-        self.nthTalk = -1
+        # counting votes 
         self.estimate_votes = {player: [] for player in self.alive}
+        # keeping track of temp info
+        self.nthTalk = -1
         self.currentDay = -1
         self.repeatTalk = False
         self.unaccused = self.alive.copy()
         self.will_vote = []
         self.talk_cases = set()
-
+        self.estimate = 0
+        self.accuse = 0
+        # if these ever equal 2 then villager has estimated and logically claimed that there is a true role
+        self.true_medium_state = 0
+        self.true_seer_state = 0
+        self.daily_push_vote = 0
 
 
 
@@ -123,22 +137,8 @@ class Villager(object):
         # scan diff_data for different info based on type
 
         # if a new day. reset the talks, estimate votes
-        if not (self.currentDay == int( self.base_info['day']) ):
-            print('----------------------------------REACHED RESET----------------------------------') #
-            print('ALIVE:') #
-            print(self.alive) #
-            print('DEAD:') #
-            print(self.dead) #
-            print('KILLED:') #
-            print(self.killed) #
-            print('EXECUTED:') #
-            print(self.executed) #
-
-            self.nthTalk = -1
-            self.agent_talks = []
-            self.estimate_votes = {player: [] for player in self.alive}
-            self.repeatTalk = False
-            self.unaccused = self.alive.copy()
+        # if not (self.currentDay == int( self.base_info['day']) ):
+            
 
         self.currentDay = int(self.base_info['day'])
 
@@ -284,7 +284,7 @@ class Villager(object):
             
             # if only 1 seer CO that seer is trustworthy
             if len(self.seers) == 1 and self.currentDay != 1:
-                self.likely_seers.add( next(iter(self.seers.values())) )
+                self.likely_seer.add( next(iter(self.seers.values())) )
                 self.likely_human.add( next(iter(self.seers.values())) )
 
             # those who div on day 1 WW are suspicous - 3/14 RNG
@@ -304,17 +304,38 @@ class Villager(object):
                             self.likely_werewolf.add(sus)
 
             # if someone divined us as WW they are likely WW or POS
-            if self.currentDay > 1:
+            if self.currentDay > 1 and self.role:
                 for sus in self.divined:
                     if self.divined[sus] == [self.idx, 'WEREWOLF']:
                         self.likely_werewolf.add(sus)
                         self.likely_possessed.add(sus)
 
+            # role specific identification (in other classes)
+
             
     # Start of the day (no return)
     def dayStart(self):
-        self.talkTurn = 0 # keep track of number of times we have talked today 
+        # keep track of number of times we have talked today 
+        self.talkTurn = 0 
         logging.debug("# DAYSTART")
+        print('----------------------------------REACHED RESET----------------------------------') #
+        print('ALIVE:') #
+        print(self.alive) #
+        print('DEAD:') #
+        print(self.dead) #
+        print('KILLED:') #
+        print(self.killed) #
+        print('EXECUTED:') #
+        print(self.executed) #
+
+        # resets
+        self.nthTalk = -1
+        self.agent_talks = []
+        self.estimate_votes = {player: [] for player in self.alive}
+        self.repeatTalk = False
+        self.unaccused = self.alive.copy()
+        self.estimate = 0
+        self.accuse = 0
         return None
 
     # conversation actions: require a properly formatted
@@ -324,7 +345,8 @@ class Villager(object):
         logging.debug("# TALK") # not sure where we need to put this 
         if self.talkTurn < 10: # max of 10 talks 
             self.talkTurn += 1
-
+            print("DAY")
+            print(int(self.base_info['day']))
             # day 1 talking logic
             if int(self.base_info['day']) == 1:
                 # 30% CO Villager
@@ -337,8 +359,9 @@ class Villager(object):
                             if self.seers[targ] > 0:
                                 return cb.vote(self.idx, targ)
                     else:
-                        cb.skip()
-                else: return cb.over()
+                        return cb.skip()  # JH
+                else:
+                    return cb.over()
 
             # day 2 talk logic
             if int(self.base_info['day']) == 2:
@@ -355,8 +378,31 @@ class Villager(object):
                     return cb.estimate(self.idx, next(iter(self.seers.values())), "SEER")
                 else:
                     return cb.skip()
-
-            return cb.over() # talk 
+                    
+            # late game logic
+            if int(self.base_info['day']) > 2:
+                # if only one medium then estimate true medium 
+                if len(self.likely_medium) == 1:
+                    if self.true_medium_state == 0:
+                        self.true_medium_state += 1
+                        return cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' )
+                    if self.true_medium_state == 1:
+                        self.repeatMediumLogic += 1
+                        return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' ), cb.comingout(list(self.likely_medium)[0], list(self.likely_medium)[0], 'MEDIUM') )
+                # if only one seer then estimate true seer
+                elif len(self.likely_seer) == 1:
+                    if self.true_seer_state == 0:
+                        self.true_seer_state += 1
+                        return cb.estimate(self.idx, list(self.likely_seer)[0], 'SEER' )
+                    if self.true_seer_state == 1:
+                        self.true_seer_state += 1
+                        return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_seer[0], 'SEER' )), cb.comingout(list(self.likely_seer)[0], list(self.likely_medium)[0], 'SEER') )
+                # claim to vote someone, need probTable
+                elif self.daily_push_vote < 3: 
+                    self.daily_push_vote += 1
+                    return cb.vote(self.idx, 1)
+                else: return cb.over() # talk
+            return cb.over() # JH: You need this extra one because the 'if/else' structure allowed some situations where nothing returned
         else:
             return cb.over() # by default, ret over
 
@@ -373,7 +419,7 @@ class Villager(object):
             if len(self.estimate_votes[player]) > max:
                 max = len(self.estimate_votes[player])
                 voteHim = player
-                if player in self.alive.union(self.likely_werewolf):
+            if len(self.estimate_votes[player]) > maxWW and player in self.alive.union(self.likely_werewolf):
                     maxWW = len(self.estimate_votes[player])
                     voteWW = player
         if voteHim in self.likely_werewolf or self.currentDay < 4:
@@ -381,26 +427,8 @@ class Villager(object):
 
         else:
             return voteWW
-        
-        '''
-        for targ in self.COs:
-            if "WEREWOLF" in self.COs[targ]:
-                return targ
-        '''
 
     # Finish (no return)
     def finish(self):
         logging.debug("# FINISH")
         return None
-
-# Do not need this as the driver function initializes it
-''' 
-agent = grnVillager(myname)
-
-# run
-if __name__ == '__main__':
-    AIWolfPyGiven.aiwolfpy.connect_parse(agent)
-'''
-
-
-

@@ -1,5 +1,6 @@
 """
     Contains Body Guard Class
+    07/'21
     James Hale
 """
 import aiwolfpy
@@ -18,16 +19,16 @@ class BodyGuard(grnVillager.Villager):
         super().update(base_info, diff_data, request)
 
     def dayStart(self):
-        super().dayStart()
+        return super().dayStart()
 
     def talk(self):
         return super().talk()
 
     def vote(self):
-        return 1
+        return super.vote()
 
     def divine(self):
-        pass
+        return super.divine()
 
     def guard(self):
         if self.mediums.keys():
@@ -35,10 +36,11 @@ class BodyGuard(grnVillager.Villager):
         return int(random.sample(self.alive, 1)[0])
 
     def whisper(self):
-        return "Over"
+        return super().whisper()
 
     def attack(self):
-        pass
+        return super().attack()
 
     def finish(self):
-        pass
+        return super().finish()
+
