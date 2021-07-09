@@ -54,10 +54,6 @@ class Werewolf(grnVillager.Villager):
                 print('REACHED POS CASE 1')
                 self.possessed.add(agent)
                 self.seer_target = self.seer_target.difference(self.possessed).difference(self.WWs)
-            # elif divs[0] in self.WWs and divs[1] == 'WEREWOLF':
-            #     print('REACHED POS CASE 2')
-            #     self.seer_target.add(agent)
-            #     self.possessed.difference(self.seer_target) # no overlap
             else:
                 print('REACHED POS CASE 3')
                 self.seer_target.add(agent)
@@ -144,6 +140,8 @@ class Werewolf(grnVillager.Villager):
         # heuristics
         for ww in self.WWs:
             self.pt.setu(ww, "WEREWOLF", 1)
+        
+        #super().update(base_info, diff_data, request)
 
     def dayStart(self):
         super().dayStart()
