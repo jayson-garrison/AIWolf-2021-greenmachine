@@ -15,16 +15,11 @@ import grnVillager
 class Medium(grnVillager.Villager):
     def __init__(self, my_name):
         super().__init__(my_name)
-        self.name = my_name
-        self.idx = -1  # Our agent ID
         self.to_report = list()
         self.hasComeOut = False
         self.id_player_roles = {}
         self.accuse_as_werewolf = list()
         self.to_vote = list()
-
-    def initialize(self, base_info, diff_data, game_setting):
-        super().initialize(base_info, diff_data, game_setting)
 
     def update(self, base_info, diff_data, request):
         """
@@ -34,11 +29,6 @@ class Medium(grnVillager.Villager):
         :param request:
         :return:
         """
-
-        if self.idx < 0:
-            self.idx = base_info['agentIdx']
-        print(request)
-        print(diff_data)
         for i in range(len(diff_data["type"])):
             if diff_data["type"][i] == "identify":
                 agent_id = diff_data["agent"][i]
@@ -55,10 +45,6 @@ class Medium(grnVillager.Villager):
                     self.to_vote.append(diff_data["agent"][i])
         super().update(base_info, diff_data, request)
 
-
-    def dayStart(self):
-        super().dayStart()
-
     def talk(self):
         if int(self.base_info['day']) == 1 and not self.hasComeOut:  # We take precedence to come out on day 1
             self.hasComeOut = True
@@ -73,21 +59,5 @@ class Medium(grnVillager.Villager):
 
     def vote(self):
         if len(self.to_vote):
-            print("HIIIIII")
             return int(self.to_vote.pop(0))
         return super().vote()  # If we have noone in mind, vote as villager
-
-    def divine(self):
-        return super().divine()
-
-    def guard(self):
-        return super().guard()
-
-    def whisper(self):
-        return super().whisper()
-
-    def attack(self):
-        return super().attack()
-
-    def finish(self):
-        return super().finish()
