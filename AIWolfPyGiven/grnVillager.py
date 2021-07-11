@@ -506,15 +506,8 @@ class Villager(object):
                                 return cb.vote(self.idx, targ)
                         return cb.skip()
                     else:
-<<<<<<< HEAD
-                        return cb.skip()  # JH
-                else:
-                    return cb.over()
-=======
                         return cb.skip()
                 else: return cb.over()
->>>>>>> 5c161a568bae982c555a9a7fdb572a03063ee0df
-
             # day 2 talk logic
             elif int(self.base_info['day']) == 2:
                 #return cb.skip()
