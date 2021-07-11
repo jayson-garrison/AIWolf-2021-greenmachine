@@ -22,13 +22,6 @@ class Medium(grnVillager.Villager):
         self.to_vote = list()
 
     def update(self, base_info, diff_data, request):
-        """
-            I think i need to reset between rounds
-        :param base_info:
-        :param diff_data:
-        :param request:
-        :return:
-        """
         for i in range(len(diff_data["type"])):
             if diff_data["type"][i] == "identify":
                 agent_id = diff_data["agent"][i]
