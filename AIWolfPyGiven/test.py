@@ -1,4 +1,3 @@
-import random
-a = {"HI", "A", "b", "c"}
-print(random.sample(a, 1)[0])
-print(random.choice(list(a)))
+a = [1,23,4,5]
+b = [1]
+print([i for i in a if i not in b])

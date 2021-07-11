@@ -22,6 +22,7 @@ class Medium(grnVillager.Villager):
         self.to_vote = list()
 
     def update(self, base_info, diff_data, request):
+        print(diff_data)
         for i in range(len(diff_data["type"])):
             if diff_data["type"][i] == "identify":
                 agent_id = diff_data["agent"][i]
@@ -51,6 +52,6 @@ class Medium(grnVillager.Villager):
         return super().talk()  # If nothing else, return the original talk() (may come out as villager)
 
     def vote(self):
-        if len(self.to_vote):
+        if self.to_vote:
             return int(self.to_vote.pop(0))
         return super().vote()  # If we have noone in mind, vote as villager
