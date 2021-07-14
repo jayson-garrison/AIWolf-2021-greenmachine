@@ -490,7 +490,8 @@ class Villager(object):
         logging.debug("# TALK") # not sure where we need to put this 
         if self.talkTurn < 10: # max of 10 talks 
             self.talkTurn += 1
-
+            print("DAY")
+            print(int(self.base_info['day']))
             # day 1 talking logic
             if int(self.base_info['day']) == 1:
                 #return cb.skip()
@@ -507,7 +508,6 @@ class Villager(object):
                     else:
                         return cb.skip()
                 else: return cb.over()
-
             # day 2 talk logic
             elif int(self.base_info['day']) == 2:
                 #return cb.skip()
@@ -552,7 +552,8 @@ class Villager(object):
                 elif self.daily_push_vote < 3: 
                     self.daily_push_vote += 1
                     return cb.vote(self.idx, 1)
-                else: return cb.over() # talk 
+                else: return cb.over() # talk
+            return cb.over() # JH: You need this extra one because the 'if/else' structure allowed some situations where nothing returned
         else:
             return cb.over() # by default, ret over
 
