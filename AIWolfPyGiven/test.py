@@ -7,7 +7,8 @@ class ProbabilityTable:
         for i in range(len(players)):
             for j in range(len(role_types)):
                 self.table[i, j] = roles[role_types[j]] / len(players)
-        print(self.table)
+        self.rows = self.table.shape[0]
+        self.columns = self.table.shape[1]
 
     def add(self, i, j, d):
         """
@@ -24,29 +25,33 @@ class ProbabilityTable:
         self.table[i, j] += d
         self.propagate(i, j, d)
 
-    def propagate(self, i, j, d):
-        for ii in range(self.table.shape[0]):
-            for jj in range(self.table.shape[1]):
-                pass_d = 0
-                if ii == i:
-                    if jj != j:
-                        x = self.table[ii, jj] - d / (6-1)
+    def propagate(self, i, j, d, depth=0, max_depth=3, tol=.000001):
+        """
+            We should either do max depth or tolerance
+        """
+        if depth < max_depth:
+            for ii in range(self.table.shape[0]):
+                for jj in range(self.table.shape[1]):
+                    pass_d = 0
+                    if ii == i:
+                        if jj != j:
+                            x = self.table[ii, jj] - d / (self.columns-1)
+                        else:
+                            x = self.table[ii, jj]
+                    elif jj == j:
+                        x = self.table[ii, jj] - d / (self.rows-1)
                     else:
-                        x = self.table[ii, jj]
-                elif jj == j:
-                    x = self.table[ii, jj] - d / (15-1)
-                else:
-                    x = self.table[ii, jj] + d / ((15-1) * (6-1))  # I MUST FIX THE HARD CODE!!!!
-                if x < 0:
-                    pass_d = 0 - x
-                    x = 0
-                elif x > 1:
-                    pass_d = 1 - x
-                    x = 1
-                self.table[ii, jj] = x
-                if abs(0-pass_d) > .0001:  # If pass_d is not close to 0 (if I check equal to zero, the thing never converges)
-                    print(pass_d)
-                    self.propagate(ii, jj, pass_d)
+                        x = self.table[ii, jj] + d / ((self.rows-1) * (self.columns-1))
+                    if x < 0:
+                        pass_d = 0 - x
+                        x = 0
+                    elif x > 1:
+                        pass_d = 1 - x
+                        x = 1
+                    self.table[ii, jj] = x
+                    if abs(0-pass_d) > tol:  # If pass_d is not close to 0 (if I check equal to zero, the thing never converges)
+                        # print(pass_d)
+                        self.propagate(ii, jj, pass_d, depth=depth+1, max_depth=max_depth, tol=tol)
 
     def display(self):
         print(self.table)
@@ -70,7 +75,10 @@ def main():
                           "Player9", "Player10", "Player11", "Player12", "Player13", "Player14", "Player15"],
                          ["Werewolf", "Possessed", "Villager", "Bodyguard", "Medium", "Seer"])
     a.verify()
-    a.add(4, 4, .9)
+    for i in range(15):
+        for j in range(6):
+            a.add(i, j, .9)
+    # a.add(4, 4, .9)
     a.display()
     a.verify()
 
