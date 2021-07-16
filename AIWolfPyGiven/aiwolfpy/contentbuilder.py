@@ -5,6 +5,7 @@
 def estimate(subject, target, role):
     return 'Agent[' + "{0:02d}".format(subject) + '] ESTIMATE Agent[' + "{0:02d}".format(target) + '] ' + role
 
+
 def comingout(subject, target, role):
     return 'Agent[' + "{0:02d}".format(subject) + '] COMINGOUT Agent[' + "{0:02d}".format(target) + '] ' + role
 
