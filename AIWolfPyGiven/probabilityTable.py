@@ -2,7 +2,7 @@ import numpy as np
 
 
 class ProbabilityTable:
-    def __init__(self, roles, players, role_types):
+    def __init__(self, roles, players):
         self.table_possessed = np.zeros(len(players))
         self.table_werewolf = np.zeros(len(players))  # WW Aligned
         self.fixed_poss = np.zeros(self.table_possessed.size)
@@ -22,7 +22,7 @@ class ProbabilityTable:
             else:
                 d = (1-self.table_possessed[index]) * increment
                 self.table_possessed[index] += d
-            self.propagate(d, self.table_possessed, self.fixed_poss, index, self.expected_poss)
+            self.propagate(self.table_possessed, self.fixed_poss, index, self.expected_poss)
 
     def wwa_prob(self, index, increment):
         if not sum(self.fixed_were * self.table_werewolf) > 3:
@@ -33,11 +33,11 @@ class ProbabilityTable:
             else:
                 d = (1 - self.table_werewolf[index]) * increment
                 self.table_werewolf[index] += d
-            self.propagate(d, self.table_werewolf, self.fixed_were, index, self.expected_were)
+            self.propagate(self.table_werewolf, self.fixed_were, index, self.expected_were)
 
-    def propagate(self, d, to_normalize, fixed_positions, index, expected):
+    def propagate(self, to_normalize, fixed_positions, index, expected):
         non_zero_one = fixed_positions.size - sum(fixed_positions)
-        alpha = (expected - sum(fixed_positions * to_normalize) - d * (1-fixed_positions[index])) \
+        alpha = (expected - sum(fixed_positions * to_normalize) - to_normalize[index] * (1-fixed_positions[index])) \
                 / (sum((1-fixed_positions) * to_normalize) - to_normalize[index] * (1-fixed_positions[index]))
         if non_zero_one - 1:
             for i in range(to_normalize.size):
@@ -70,10 +70,10 @@ def main():
     a.display()
     a.verify()
     for i in range(15):
-        a.wwa_prob(i, 0)
+        a.wwa_prob(i, .8)
         a.display()
-    a.wwa_prob(6, 1)
-    a.wwa_prob(7, 0)
+    # a.wwa_prob(6, 1)
+    # a.wwa_prob(7, 0)
     a.display()
     a.verify()
 
