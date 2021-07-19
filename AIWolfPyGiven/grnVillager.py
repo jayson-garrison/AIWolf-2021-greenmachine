@@ -23,6 +23,7 @@ from aiwolfpy import contentbuilder as cb
 import logging, json
 import random
 from CheatCodes import CheatCodes
+from probabilityTable import ProbabilityTable
 
 myname = 'greenmachine'
 
@@ -117,12 +118,26 @@ class Villager(object):
         self.true_medium_state = 0
         self.true_seer_state = 0
         self.daily_push_vote = 0
-        self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
+
+        #self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
+        self.pt = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1},
+                         ["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8",
+                          "Player9", "Player10", "Player11", "Player12", "Player13", "Player14", "Player15"],
+                        )
+        self.alpha = .1
+        self.beta = .15
+        self.gamma = .2
+        self.delta = .25
+        self.epsilon = .3
+        
         self.prev_estimate_votes = {player: set() for player in self.alive}
         self.prev_voted_out = -1
         self.votes = {player: set() for player in self.alive}
         self.prev_votes = {player: set() for player in self.alive}
         self.prev_dead = -1
+
+        #set of each player that hasn't satisfied a heuristic, indexed by heuristic number (up to 13, total heuristics)
+        self.heuristics = [{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15} for i in range(13)]
         
 
         self.repeatMediumLogic = 0 #?
@@ -295,18 +310,24 @@ class Villager(object):
             if "XOR" in self.agent_talks[self.nthTalk][2]:
                 pass
             '''
+
+        print('[0]')
         # estimate roles
         if self.role == "VILLAGER":
             print("[H] set player villager")
             #self.pt.setu(self.idx, "V/BG", 1)
+            self.pt.wwa_prob(self.idx, 0)
+            self.pt.pos_prob(self.idx, 0)
 
-        print('[0]')
+        print('[1]')
         # if only 1 medium CO that medium is trustworthy
         if len(self.mediums) == 1 and self.currentDay != 1:
             print("[H] if only 1 medium CO that medium is trustworthy: " + next(iter(self.mediums.keys())))
             self.likely_medium.add( next(iter(self.mediums.keys())) )
             self.likely_human.add( next(iter(self.mediums.keys())) )
             #self.pt.setu(next(iter(self.mediums.keys())), "MEDIUM", 1)
+            self.pt.wwa_prob(next(iter(self.mediums.keys())), 0)
+            self.pt.pos_prob(next(iter(self.mediums.keys())), 0)
         
         # if only 1 seer CO that seer is trustworthy
         if len(self.seers) == 1 and self.currentDay != 1:
@@ -314,8 +335,10 @@ class Villager(object):
             self.likely_seer.add( next(iter(self.seers.keys())) )
             self.likely_human.add( next(iter(self.seers.keys())) )
             #self.pt.setu(next(iter(self.seers.keys())), "SEER", 1)
+            self.pt.wwa_prob(next(iter(self.seers.keys())), 0)
+            self.pt.pos_prob(next(iter(self.seers.keys())), 0)
 
-        print('[1]')
+        print('[2]')
         # those who div on day 1 WW are suspicous - 3/14 RNG
         if len(self.seers) > 1 and self.currentDay == 1:
             print("[H] those who div on day 1 WW are suspicous - 3/14 RNG")
@@ -325,7 +348,9 @@ class Villager(object):
                     self.likely_werewolf.add(sus)
                     #self.pt.update(sus, "WEREWOLF", .5)
                     #self.pt.update(sus, "POSSESSED", .5)
-        print('[2]')
+                    self.pt.wwa_prob(sus, 11/14-self.pt.get_prob(sus)[0])
+                    self.pt.pos_prob(sus, 11/14-self.pt.get_prob(sus)[1])
+        print('[3]')
         # seers who CO and were killed are deemed innocent, the others are suspicous
         if len(self.seers) > 1:
             for inno in self.seers:
@@ -337,8 +362,11 @@ class Villager(object):
                         self.likely_werewolf.add(sus)
                         #self.pt.update(sus, "POSSESSED", .25)
                         #self.pt.update(sus, "WEREWOLF", .25)
+                        self.pt.wwa_prob(sus, self.beta * (1-self.pt.get_prob(sus)[0]))
+                        self.pt.pos_prob(sus, self.beta * (1-self.pt.get_prob(sus)[0]))
+                        
 
-        print('[3]')
+        print('[4]')
         # if someone divined us as WW they are likely WW or POS
         if self.currentDay > 1 and self.role == "VILLAGER":
             for sus in self.divined:
@@ -348,44 +376,58 @@ class Villager(object):
                     self.likely_possessed.add(sus)
                     #self.pt.update(sus, "POSSESSED", .5)
                     #self.pt.update(sus, "WEREWOLF", .5)
+                    self.pt.wwa_prob(sus, 1)
+                    self.pt.pos_prob(sus, .8 - self.pt.get_prob(sus)[1])
 
-        print('[4]')
+        print('[5]')
+        # if killed, prob human 1
         for player in self.killed:
             self.likely_human.add(player)
             #self.pt.setu(player, "V/BG", 1)
+            self.pt.wwa_prob(player, 0)
+            self.pt.pos_prob(player, 0)
         
-        print('[5]')
+        print('[6]')
         if self.currentDay == 1 and len(self.seers) == 2:
             print("[H] 2 seers....")
             seersIter = iter(self.seers)
             seer1 = next(seersIter)
             seer2 = next(seersIter)
             if self.seers[seer1] == self.seers[seer2]:
-                pass
                 # self.pt.setu(localSeers[0], "SEER", .5)
                 # self.pt.setu(localSeers[0], "POSSESSED", .25)
                 # self.pt.setu(localSeers[0], "WEREWOLF", .25)
                 # self.pt.setu(localSeers[1], "SEER", .5)
                 # self.pt.setu(localSeers[1], "POSSESSED", .25)
                 # self.pt.setu(localSeers[1], "WEREWOLF", .25)
+                self.pt.wwa_prob(seer1, .5-self.pt.get_prob(seer1)[0])
+                self.pt.wwa_prob(seer2, .5-self.pt.get_prob(seer2)[0])
+                self.pt.pos_prob(seer1, .5-self.pt.get_prob(seer1)[1])
+                self.pt.pos_prob(seer2, .5-self.pt.get_prob(seer2)[1])
             elif self.seers[seer1] > 0: #0 divined the werewolf..
-                pass
                 # self.pt.setu(localSeers[0], "SEER", 3/14)
                 # self.pt.setu(localSeers[0], "POSSESSED", (11/14)/2)
                 # self.pt.setu(localSeers[0], "WEREWOLF", (11/14)/2)
                 # self.pt.setu(localSeers[1], "SEER", 11/14)
                 # self.pt.setu(localSeers[1], "POSSESSED", (3/14)/2)
                 # self.pt.setu(localSeers[1], "WEREWOLF", (3/14)/2)
+                self.pt.wwa_prob(seer1, 11/14-self.pt.get_prob(seer1)[0])
+                self.pt.wwa_prob(seer2, 3/14-self.pt.get_prob(seer2)[0])
+                self.pt.pos_prob(seer1, 11/14-self.pt.get_prob(seer1)[1])
+                self.pt.pos_prob(seer2, 3/14-self.pt.get_prob(seer2)[1])
             else: #1 divined the werewolf..
-                pass
                 # self.pt.setu(localSeers[1], "SEER", 3/14)
                 # self.pt.setu(localSeers[1], "POSSESSED", (11/14)/2)
                 # self.pt.setu(localSeers[1], "WEREWOLF", (11/14)/2)
                 # self.pt.setu(localSeers[0], "SEER", 11/14)
                 # self.pt.setu(localSeers[0], "POSSESSED", (3/14)/2)
                 # self.pt.setu(localSeers[0], "WEREWOLF", (3/14)/2)
+                self.pt.wwa_prob(seer2, 11/14-self.pt.get_prob(seer2)[0])
+                self.pt.wwa_prob(seer1, 3/14-self.pt.get_prob(seer1)[0])
+                self.pt.pos_prob(seer2, 11/14-self.pt.get_prob(seer2)[1])
+                self.pt.pos_prob(seer1, 3/14-self.pt.get_prob(seer1)[1])
         
-        print('[6]')
+        print('[7]')
         #If a seer div the other as WW, increase p to be WW aligned as true seers do not need to divine the other fake seer as they know they are fake
         for seer in list(self.divined.keys()):
             if (self.divined[seer][0] in list(self.seers.keys())) and (self.divined[seer][1] == "WEREWOLF"):
@@ -394,8 +436,10 @@ class Villager(object):
                 self.likely_werewolf.add(seer)
                 #self.pt.update(seer, "WEREWOLF", .2)
                 #self.pt.update(seer, "POSSESSED", .2)
+                self.pt.wwa_prob(seer, .6 * (1-self.pt.get_prob(seer)[0]))
+                self.pt.pos_prob(seer, .6 * (1-self.pt.get_prob(seer)[1]))
 
-        print('[7]')
+        #print('[7]')
         # #An agent is killed who was almost executed p HU increase
         # if self.currentDay > 1:
         #     for targ in self.prev_estimate_votes:
@@ -418,30 +462,51 @@ class Villager(object):
             self.likely_werewolf.add(liar)
             #self.pt.update(liar, "WEREWOLF", .15)
             #self.pt.update(liar, "POSSESSED", .15)
+            self.pt.wwa_prob(liar, self.beta * (1-self.pt.get_prob(liar)[0]))
+            self.pt.pos_prob(liar, self.beta * (1-self.pt.get_prob(liar)[1]))
         print("LiarList: " + str(liarList))
 
         print('[9]')
         #A seer is killed, likely true seer, earlier in the game is more uncertain
         for seer in self.seers:
             if seer in self.killed:
-                print("[H] A seer is killed, likely true seer, earlier in the game is more uncertain")
+                print("[H] A seer is killed, likely true seer, earlier in the game is more uncertain [killed]")
                 # if self.currentDay > 3:
                 #     self.pt.update(liar, "SEER", .5)
                 # else: #early game
                 #     self.pt.update(liar, "SEER", .2)
                 
-                if len(self.seers == 2): #other seer sus
-                    pass
+                if len(self.seers) == 2: #other seer sus
                     #self.pt.update(next(iter(set(self.seers.keys()).difference({liar}))), "POSSESSED", .35)
+                    self.pt.wwa_prob(next(iter(set(self.seers.keys()).difference({seer}))), .7-self.pt.get_prob(next(iter(set(self.seers.keys()).difference({seer}))))[0])
+                    self.pt.pos_prob(next(iter(set(self.seers.keys()).difference({seer}))), .7-self.pt.get_prob(next(iter(set(self.seers.keys()).difference({seer}))))[1])
+            if seer in self.executed:
+                print("[H] A seer is killed, likely true seer, earlier in the game is more uncertain [executed]")
+                self.pt.wwa_prob(seer, .7 * (1 - self.pt.get_prob(seer)[0]))
+                self.pt.pos_prob(seer, .7 * (1 - self.pt.get_prob(seer)[1]))
+
         
         print('[10]')
-        #A medium is killed/executed, likely true medium
+        #A medium is executed, likely not true medium
         for medium in self.mediums:
-            if (medium in self.killed) or (medium in self.executed):
-                print("[H] A medium is killed/executed, likely true medium: " + str(medium))
+            if medium in self.killed:
+                print("[H] A medium is killed/executed [killed], likely true medium: " + str(medium))
+
+                # if len(self.mediums) == 2: #other med sus
+                #     #self.pt.update(next(iter(set(self.seers.keys()).difference({liar}))), "POSSESSED", .35)
+                #     self.pt.wwa_prob(next(iter(set(self.mediums.keys()).difference({medium}))), .75 * (1-self.pt.get_prob(next(iter(set(self.seers.keys()).difference({medium}))))[0]))
+                #     self.pt.pos_prob(next(iter(set(self.mediums.keys()).difference({medium}))), .75 * (1-self.pt.get_prob(next(iter(set(self.seers.keys()).difference({medium}))))[1]))
                 #self.pt.update(medium, "MEDIUM", .5)
-        
-        print('[11]' + str(self.votes) + str(self.prev_votes) + "prevdead: " + str(self.prev_dead))
+                if len(self.mediums) == 2: #other med sus
+                    #self.pt.update(next(iter(set(self.seers.keys()).difference({liar}))), "POSSESSED", .35)
+                    self.pt.wwa_prob(next(iter(set(self.mediums.keys()).difference({medium}))), .8-self.pt.get_prob(next(iter(set(self.mediums.keys()).difference({medium}))))[0])
+                    self.pt.pos_prob(next(iter(set(self.mediums.keys()).difference({medium}))), .8-self.pt.get_prob(next(iter(set(self.mediums.keys()).difference({medium}))))[1])
+            if medium in self.executed:
+                print("[H] A seer is killed, likely true seer, earlier in the game is more uncertain [executed]")
+                self.pt.wwa_prob(medium, .8 - self.pt.get_prob(medium)[0])
+                self.pt.pos_prob(medium, .8  - self.pt.get_prob(medium)[1])
+
+        print('[11]') #+ str(self.votes) + str(self.prev_votes) + "prevdead: " + str(self.prev_dead))
         #An agent votes for an accepted medium or seer, likely WW
         for player in self.alive:
             for medium in self.likely_medium:
@@ -449,19 +514,25 @@ class Villager(object):
                     print("[H] An agent votes for an accepted medium or seer, likely WW [M]")
                     #self.pt.update(liar, "WEREWOLF", .2)
                     #self.pt.update(liar, "POSSESSED", .2)
+                    self.pt.wwa_prob(player, self.delta * (1-self.pt.get_prob(player)[0]))
+                    self.pt.pos_prob(player, self.delta * (1-self.pt.get_prob(player)[1]))
             for seer in self.likely_seer:
                 if player in self.votes[seer]:
                     print("[H] An agent votes for an accepted medium or seer, likely WW [S]")
                     #self.pt.update(liar, "WEREWOLF", .2)
                     #self.pt.update(liar, "POSSESSED", .2)
+                    self.pt.wwa_prob(player, self.delta * (1-self.pt.get_prob(player)[0]))
+                    self.pt.pos_prob(player, self.delta * (1-self.pt.get_prob(player)[1]))
 
         print('[12]')
         #An agent votes for someone who was executed next round
-        if self.prev_dead in self.prev_votes:
+        if self.prev_dead in self.prev_votes and self.prev_dead != -1:
             for voter in self.prev_votes[self.prev_dead]:
-                print("[H] An agent votes for someone who was executed next round:" + voter)
+                print("[H] An agent votes for someone who was killed next round:" + voter)
                 #self.pt.update(voter, "POSSESSED", .3)
                 #self.pt.update(voter, "WEREWOLF", .3)
+                self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
+                self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
 
         print('[13]')
         #A seer divines a werewolf as human (werewolf status declared by medium)
@@ -474,6 +545,8 @@ class Villager(object):
                             print(' - seer: ' + str(seer) + " medium: " + str(medium) + "target:" + seerPair[0])
                             #self.pt.setu(seer, "POSSESSED", .5)
                             #self.pt.setu(seer, "WEREWOLF", .5) 
+                            self.pt.wwa_prob(seer, 1)
+                            self.pt.pos_prob(seer, 1)
 
 
         print("[+] reached end of update")
@@ -483,6 +556,7 @@ class Villager(object):
     # Start of the day (no return)
     def dayStart(self):
         # keep track of number of times we have talked today 
+        self.pt.display()
         self.talkTurn = 0 
         logging.debug("# DAYSTART")
         print('----------------------------------REACHED RESET---------------------------------- CURRENT DAY: ' + str(self.currentDay)) 
@@ -586,46 +660,53 @@ class Villager(object):
     # act based on the lists
     def vote(self):
         logging.debug("# VOTE")
-        self.pt.print()
+        self.pt.display()
         max = -1
         maxP = -1 #player with max value
-        second = -1
+        #second = -1
 
+        for player in self.alive:
+            if self.pt.get_prob(player)[0] > max:
+                max = self.pt.get_prob(player)[0]
+                maxP = player
+
+        return maxP
+                
         #first loop find max
-        for player in self.alive:
-            if self.pt.get(player, "WEREWOLF") > max:
-                max = self.pt.get(player, "WEREWOLF")
-                maxP = player
+        # for player in self.alive:
+        #     if self.pt.get(player, "WEREWOLF") > max:
+        #         max = self.pt.get(player, "WEREWOLF")
+        #         maxP = player
 
-            #remove if columns w & p merge
-            if self.pt.get(player, "POSSESSED") > max:
-                max = self.pt.get(player, "POSSESSED")
-                maxP = player
+        #     #remove if columns w & p merge
+        #     if self.pt.get(player, "POSSESSED") > max:
+        #         max = self.pt.get(player, "POSSESSED")
+        #         maxP = player
         
-        #second loop find second max
-        for player in self.alive:
-            if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
-                second = self.pt.get(player, "WEREWOLF")
+        # #second loop find second max
+        # for player in self.alive:
+        #     if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
+        #         second = self.pt.get(player, "WEREWOLF")
 
-            #remove if columns w & p merge
-            if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
-                second = self.pt.get(player, "POSSESSED")
+        #     #remove if columns w & p merge
+        #     if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
+        #         second = self.pt.get(player, "POSSESSED")
         
         #finally compare and decide if voting in majority
         
-        if max - second < .5 and self.currentDay < 4:
-            #if day num low and difference small, vote majority
-            majority = -1
-            majorityP = -1
-            for player in self.estimate_votes:
-                if len(self.estimate_votes[player]) > majority:
-                    majority = len(self.estimate_votes[player])
-                    majorityP = player
-            return majorityP
+        # if max - second < .5 and self.currentDay < 4:
+        #     #if day num low and difference small, vote majority
+        #     majority = -1
+        #     majorityP = -1
+        #     for player in self.estimate_votes:
+        #         if len(self.estimate_votes[player]) > majority:
+        #             majority = len(self.estimate_votes[player])
+        #             majorityP = player
+        #     return majorityP
 
-        else:
-            #difference great or day num high enough to have sufficient data..
-            return maxP
+        # else:
+        #     #difference great or day num high enough to have sufficient data..
+        #     return maxP
 
         '''
         #OLD VOTE FUNCT
