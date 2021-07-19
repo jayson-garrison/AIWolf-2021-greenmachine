@@ -298,22 +298,24 @@ class Villager(object):
         # estimate roles
         if self.role == "VILLAGER":
             print("[H] set player villager")
-            self.pt.setu(self.idx, "V/BG", 1)
+            #self.pt.setu(self.idx, "V/BG", 1)
 
+        print('[0]')
         # if only 1 medium CO that medium is trustworthy
         if len(self.mediums) == 1 and self.currentDay != 1:
             print("[H] if only 1 medium CO that medium is trustworthy: " + next(iter(self.mediums.keys())))
             self.likely_medium.add( next(iter(self.mediums.keys())) )
             self.likely_human.add( next(iter(self.mediums.keys())) )
-            self.pt.setu(next(iter(self.mediums.keys())), "MEDIUM", 1)
+            #self.pt.setu(next(iter(self.mediums.keys())), "MEDIUM", 1)
         
         # if only 1 seer CO that seer is trustworthy
         if len(self.seers) == 1 and self.currentDay != 1:
             print("[H] if only 1 seer CO that seer is trustworthy")
             self.likely_seer.add( next(iter(self.seers.keys())) )
             self.likely_human.add( next(iter(self.seers.keys())) )
-            self.pt.setu(next(iter(self.seers.keys())), "SEER", 1)
+            #self.pt.setu(next(iter(self.seers.keys())), "SEER", 1)
 
+        print('[1]')
         # those who div on day 1 WW are suspicous - 3/14 RNG
         if len(self.seers) > 1 and self.currentDay == 1:
             print("[H] those who div on day 1 WW are suspicous - 3/14 RNG")
@@ -321,127 +323,147 @@ class Villager(object):
                 if self.seers[sus] > 0:
                     self.likely_possessed.add(sus)
                     self.likely_werewolf.add(sus)
-                    self.pt.update(sus, "WEREWOLF", .5)
-                    self.pt.update(sus, "POSSESSED", .5)
-        
+                    #self.pt.update(sus, "WEREWOLF", .5)
+                    #self.pt.update(sus, "POSSESSED", .5)
+        print('[2]')
         # seers who CO and were killed are deemed innocent, the others are suspicous
         if len(self.seers) > 1:
-            print("[H] seers who CO and were killed are deemed innocent, the others are suspicous")
             for inno in self.seers:
                 if inno in self.killed:
+                    print("[H] seers who CO and were killed are deemed innocent, the others are suspicous")
                     susSeers = self.seers.copy()  
                     susSeers.pop(inno)
                     for sus in susSeers:
                         self.likely_werewolf.add(sus)
-                        self.pt.update(sus, "POSSESSED", .25)
-                        self.pt.update(sus, "WEREWOLF", .25)
+                        #self.pt.update(sus, "POSSESSED", .25)
+                        #self.pt.update(sus, "WEREWOLF", .25)
 
+        print('[3]')
         # if someone divined us as WW they are likely WW or POS
         if self.currentDay > 1 and self.role == "VILLAGER":
-            print("[H] if someone divined us as WW they are likely WW or POS")
             for sus in self.divined:
                 if self.divined[sus] == [self.idx, 'WEREWOLF']:
+                    print("[H] if someone divined us as WW they are likely WW or POS")
                     self.likely_werewolf.add(sus)
                     self.likely_possessed.add(sus)
-                    self.pt.update(sus, "POSSESSED", .5)
-                    self.pt.update(sus, "WEREWOLF", .5)
+                    #self.pt.update(sus, "POSSESSED", .5)
+                    #self.pt.update(sus, "WEREWOLF", .5)
 
+        print('[4]')
         for player in self.killed:
             self.likely_human.add(player)
-            self.pt.setu(player, "V/BG", 1)
+            #self.pt.setu(player, "V/BG", 1)
         
+        print('[5]')
         if self.currentDay == 1 and len(self.seers) == 2:
             print("[H] 2 seers....")
-            localSeers = list(self.seers.keys())
-            if self.seers(localSeers[0]) == self.seers(localSeers[1]):
-                self.pt.setu(localSeers[0], "SEER", .5)
-                self.pt.setu(localSeers[0], "POSSESSED", .25)
-                self.pt.setu(localSeers[0], "WEREWOLF", .25)
-                self.pt.setu(localSeers[1], "SEER", .5)
-                self.pt.setu(localSeers[1], "POSSESSED", .25)
-                self.pt.setu(localSeers[1], "WEREWOLF", .25)
-            elif self.seers(localSeers[0]) > 0: #0 divined the werewolf..
-                self.pt.setu(localSeers[0], "SEER", 3/14)
-                self.pt.setu(localSeers[0], "POSSESSED", (11/14)/2)
-                self.pt.setu(localSeers[0], "WEREWOLF", (11/14)/2)
-                self.pt.setu(localSeers[1], "SEER", 11/14)
-                self.pt.setu(localSeers[1], "POSSESSED", (3/14)/2)
-                self.pt.setu(localSeers[1], "WEREWOLF", (3/14)/2)
+            seersIter = iter(self.seers)
+            seer1 = next(seersIter)
+            seer2 = next(seersIter)
+            if self.seers[seer1] == self.seers[seer2]:
+                pass
+                # self.pt.setu(localSeers[0], "SEER", .5)
+                # self.pt.setu(localSeers[0], "POSSESSED", .25)
+                # self.pt.setu(localSeers[0], "WEREWOLF", .25)
+                # self.pt.setu(localSeers[1], "SEER", .5)
+                # self.pt.setu(localSeers[1], "POSSESSED", .25)
+                # self.pt.setu(localSeers[1], "WEREWOLF", .25)
+            elif self.seers[seer1] > 0: #0 divined the werewolf..
+                pass
+                # self.pt.setu(localSeers[0], "SEER", 3/14)
+                # self.pt.setu(localSeers[0], "POSSESSED", (11/14)/2)
+                # self.pt.setu(localSeers[0], "WEREWOLF", (11/14)/2)
+                # self.pt.setu(localSeers[1], "SEER", 11/14)
+                # self.pt.setu(localSeers[1], "POSSESSED", (3/14)/2)
+                # self.pt.setu(localSeers[1], "WEREWOLF", (3/14)/2)
             else: #1 divined the werewolf..
-                self.pt.setu(localSeers[1], "SEER", 3/14)
-                self.pt.setu(localSeers[1], "POSSESSED", (11/14)/2)
-                self.pt.setu(localSeers[1], "WEREWOLF", (11/14)/2)
-                self.pt.setu(localSeers[0], "SEER", 11/14)
-                self.pt.setu(localSeers[0], "POSSESSED", (3/14)/2)
-                self.pt.setu(localSeers[0], "WEREWOLF", (3/14)/2)
-            
+                pass
+                # self.pt.setu(localSeers[1], "SEER", 3/14)
+                # self.pt.setu(localSeers[1], "POSSESSED", (11/14)/2)
+                # self.pt.setu(localSeers[1], "WEREWOLF", (11/14)/2)
+                # self.pt.setu(localSeers[0], "SEER", 11/14)
+                # self.pt.setu(localSeers[0], "POSSESSED", (3/14)/2)
+                # self.pt.setu(localSeers[0], "WEREWOLF", (3/14)/2)
+        
+        print('[6]')
         #If a seer div the other as WW, increase p to be WW aligned as true seers do not need to divine the other fake seer as they know they are fake
-        for seer in self.divined:
-            if (self.divined[seer][0] in self.seers) and (self.divined[seer][1] == "WEREWOLF"):
+        for seer in list(self.divined.keys()):
+            if (self.divined[seer][0] in list(self.seers.keys())) and (self.divined[seer][1] == "WEREWOLF"):
                 print("[H] If a seer div the other as WW, increase p to be WW aligned as true seers do not need to divine the other fake seer as they know they are fake")
                 self.likely_possessed.add(seer)
                 self.likely_werewolf.add(seer)
-                self.pt.update(seer, "WEREWOLF", .2)
-                self.pt.update(seer, "POSSESSED", .2)
+                #self.pt.update(seer, "WEREWOLF", .2)
+                #self.pt.update(seer, "POSSESSED", .2)
 
-        #An agent is killed who was almost executed p HU increase
-        if self.currentDay > 1:
-            for targ in self.prev_estimate_votes:
-                if len(self.prev_estimate_votes[self.prev_voted_out]) - len(self.prev_estimate_votes[targ]) < 2 and targ in self.killed: #almost voted out and killed
-                    print("[H] An agent is killed who was almost executed p HU increase")
-                    self.update(targ, "V/BG", .2)
+        print('[7]')
+        # #An agent is killed who was almost executed p HU increase
+        # if self.currentDay > 1:
+        #     for targ in self.prev_estimate_votes:
+        #         if len(self.prev_estimate_votes[self.prev_voted_out]) - len(self.prev_estimate_votes[targ]) < 2 and targ in self.killed: #almost voted out and killed
+        #             print("[H] An agent is killed who was almost executed p HU increase")
+        #             #self.update(targ, "V/BG", .2)
         
+        print('[8]')
         #An agent does not vote for who they say they were going to increase WW aligned
         #take union of each player estimate and votes
         liarList = [] 
         for player in self.votes:
-            liarUnion = self.votes[player].union(self.estimate_votes[player])
-            liarList.append(list(liarUnion))
+            if player in self.estimate_votes:
+                liarUnion = self.votes[player].union(self.estimate_votes[player])
+                if len(liarUnion) > 0:
+                    liarList.append(list(liarUnion))
         liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
         for liar in liarDuplicates:
-            self.pt.update(liar, "WEREWOLF", .15)
-            self.pt.update(liar, "POSSESSED", .15)
-        print("LiarList: " + liarList)
+            self.likely_possessed.add(liar)
+            self.likely_werewolf.add(liar)
+            #self.pt.update(liar, "WEREWOLF", .15)
+            #self.pt.update(liar, "POSSESSED", .15)
+        print("LiarList: " + str(liarList))
 
+        print('[9]')
         #A seer is killed, likely true seer, earlier in the game is more uncertain
         for seer in self.seers:
             if seer in self.killed:
                 print("[H] A seer is killed, likely true seer, earlier in the game is more uncertain")
-                if self.currentDay > 3:
-                    self.pt.update(liar, "SEER", .5)
-                else: #early game
-                    self.pt.update(liar, "SEER", .2)
+                # if self.currentDay > 3:
+                #     self.pt.update(liar, "SEER", .5)
+                # else: #early game
+                #     self.pt.update(liar, "SEER", .2)
                 
                 if len(self.seers == 2): #other seer sus
-                    self.pt.update(next(iter(set(self.seers.keys()).difference({liar}))), "POSSESSED", .35)
+                    pass
+                    #self.pt.update(next(iter(set(self.seers.keys()).difference({liar}))), "POSSESSED", .35)
         
+        print('[10]')
         #A medium is killed/executed, likely true medium
         for medium in self.mediums:
             if (medium in self.killed) or (medium in self.executed):
-                print("[H] A medium is killed/executed, likely true medium")
-                self.pt.update(medium, "MEDIUM", .5)
+                print("[H] A medium is killed/executed, likely true medium: " + str(medium))
+                #self.pt.update(medium, "MEDIUM", .5)
         
+        print('[11]' + str(self.votes) + str(self.prev_votes) + "prevdead: " + str(self.prev_dead))
         #An agent votes for an accepted medium or seer, likely WW
         for player in self.alive:
             for medium in self.likely_medium:
                 if player in self.votes[medium]:
                     print("[H] An agent votes for an accepted medium or seer, likely WW [M]")
-                    self.pt.update(liar, "WEREWOLF", .2)
-                    self.pt.update(liar, "POSSESSED", .2)
+                    #self.pt.update(liar, "WEREWOLF", .2)
+                    #self.pt.update(liar, "POSSESSED", .2)
             for seer in self.likely_seer:
                 if player in self.votes[seer]:
                     print("[H] An agent votes for an accepted medium or seer, likely WW [S]")
-                    self.pt.update(liar, "WEREWOLF", .2)
-                    self.pt.update(liar, "POSSESSED", .2)
+                    #self.pt.update(liar, "WEREWOLF", .2)
+                    #self.pt.update(liar, "POSSESSED", .2)
 
-            
+        print('[12]')
         #An agent votes for someone who was executed next round
-        for voter in self.prev_votes[self.prev_dead]:
-            print("[H] An agent votes for someone who was executed next round:" + voter)
-            self.pt.update(voter, "POSSESSED", .3)
-            self.pt.update(voter, "WEREWOLF", .3)
+        if self.prev_dead in self.prev_votes:
+            for voter in self.prev_votes[self.prev_dead]:
+                print("[H] An agent votes for someone who was executed next round:" + voter)
+                #self.pt.update(voter, "POSSESSED", .3)
+                #self.pt.update(voter, "WEREWOLF", .3)
 
-        
+        print('[13]')
         #A seer divines a werewolf as human (werewolf status declared by medium)
         for seer in self.divined:
             for seerPair in  self.divined[seer]:
@@ -449,11 +471,12 @@ class Villager(object):
                     for mediumPair in self.identified[medium]:
                         if seerPair[0] == mediumPair[0] and seerPair[1] != mediumPair[1]: #same name different identities
                             print("[H] A seer divines a werewolf as human (werewolf status declared by medium)")
-                            self.pt.setu(seer, "POSSESSED", .5)
-                            self.pt.setu(seer, "WEREWOLF", .5) 
+                            print(' - seer: ' + str(seer) + " medium: " + str(medium) + "target:" + seerPair[0])
+                            #self.pt.setu(seer, "POSSESSED", .5)
+                            #self.pt.setu(seer, "WEREWOLF", .5) 
 
 
-
+        print("[+] reached end of update")
         # # role specific identification (in other classes)
 
             

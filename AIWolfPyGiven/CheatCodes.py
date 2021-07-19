@@ -88,8 +88,12 @@ class CheatCodes(object):
         #         self.table[rowIter][colIter] += value / ((len(self.table) - 1) * (len(self.table[row]) - 1))
 
     def setu(self, player, columnName, value):
-        incrimentVal = value - self.get(player, columnName)
-        return self.update(player, columnName, incrimentVal)
+        try:
+            incrimentVal = value - self.get(player, columnName)
+        except:
+            print("[-] UH OH. SETU!")
+    
+        self.update(player, columnName, incrimentVal)
 
     def print(self):
         print('------- Cheat Codes Table -------')
