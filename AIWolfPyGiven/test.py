@@ -56,6 +56,13 @@ class ProbabilityTable:
     def display(self):
         print(self.table)
 
+    def zero_cols(self, row):
+        for i in range(len(self.table[row])):
+            print(i)
+
+    def zero_rows(self, col):
+        pass
+
     def verify(self):
         print("Verify rows")
         for i in range(len(self.table[:, 0])):  # Rows
@@ -74,13 +81,15 @@ def main():
                          ["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8",
                           "Player9", "Player10", "Player11", "Player12", "Player13", "Player14", "Player15"],
                          ["Werewolf", "Possessed", "Villager", "Bodyguard", "Medium", "Seer"])
-    a.verify()
+    # a.verify()
     for i in range(15):
         for j in range(6):
-            a.add(i, j, .9)
+            t = a.table[i, j]
+            a.add(i, j, -.1)
+            print(a.table[i, j] - t)
     # a.add(4, 4, .9)
-    a.display()
-    a.verify()
+    # a.display()
+    # a.verify()
 
 
 if __name__ == '__main__':
