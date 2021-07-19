@@ -465,6 +465,7 @@ class Villager(object):
             self.pt.wwa_prob(liar, self.beta * (1-self.pt.get_prob(liar)[0]))
             self.pt.pos_prob(liar, self.beta * (1-self.pt.get_prob(liar)[1]))
         print("LiarList: " + str(liarList))
+        print("LiarDuplicates: " + str(liarDuplicates))
 
         print('[9]')
         #A seer is killed, likely true seer, earlier in the game is more uncertain
