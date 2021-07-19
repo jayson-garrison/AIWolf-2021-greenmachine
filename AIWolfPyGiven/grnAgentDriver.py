@@ -71,6 +71,20 @@ class grnAgent(object):
             else:
                 self.role = Villager.Villager(self.myName)
             self.role.initialize(base_info, diff_data, game_setting)
+        elif self.game_setting['playerNum'] == 5: 
+            if myRole == 'SEER':
+                self.role = Seer.Seer(self.myName)
+            # elif myRole == 'MEDIUM':
+            #     self.role = Medium.Medium(self.myName)
+            # elif myRole == 'BODYGUARD':
+            #     self.role = Bodyguard.BodyGuard(self.myName)
+            elif myRole == 'POSSESSED':
+                self.role = Possessed.Possessed(self.myName)
+            elif myRole == 'WEREWOLF':
+                self.role = Werewolf.Werewolf(self.myName)
+            else:
+                self.role = Villager.Villager(self.myName)
+            self.role.initialize(base_info, diff_data, game_setting)
     # action functions, if an exception occurs, perform a standard action
     
     def update(self, base_info, diff_data, request):
