@@ -3,9 +3,9 @@ import random
 
 
 class ProbabilityTable:
-    def __init__(self, roles, players):
-        self.table_possessed = np.zeros(len(players))
-        self.table_werewolf = np.zeros(len(players))  # WW Aligned
+    def __init__(self, roles, num_players):
+        self.table_possessed = np.zeros(num_players)
+        self.table_werewolf = np.zeros(num_players)  # WW Aligned
         self.fixed_poss = np.zeros(self.table_possessed.size)
         self.fixed_were = np.zeros(self.table_werewolf.size)
         for i in range(self.table_possessed.size):
@@ -21,7 +21,8 @@ class ProbabilityTable:
                 self.fixed_poss[index] = 1
                 self.table_possessed[index] = increment
             else:
-                self.table_possessed[index] += (1-self.table_possessed[index]) * increment
+                # self.table_possessed[index] += (1-self.table_possessed[index]) * increment
+                self.table_possessed[index] += increment
             self.propagate(self.table_possessed, self.fixed_poss, index, self.expected_poss)
 
     def wwa_prob(self, index, increment):
@@ -31,7 +32,8 @@ class ProbabilityTable:
                 self.fixed_were[index] = 1
                 self.table_werewolf[index] = increment
             else:
-                self.table_werewolf[index] += (1 - self.table_werewolf[index]) * increment
+                # self.table_werewolf[index] += (1 - self.table_werewolf[index]) * increment
+                self.table_werewolf[index] += increment
             self.propagate(self.table_werewolf, self.fixed_were, index, self.expected_were)
 
     def propagate(self, to_normalize, fixed_positions, index, expected):
@@ -64,10 +66,7 @@ def main():
         Main
     :return: void
     """
-    a = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1},
-                         ["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8",
-                          "Player9", "Player10", "Player11", "Player12", "Player13", "Player14", "Player15"],
-                        )
+    a = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1}, 15)
     a.display()
     a.verify()
     a.wwa_prob(1, 0)
@@ -75,8 +74,8 @@ def main():
     a.wwa_prob(3, 0)
     a.wwa_prob(4, 0)
     for i in range(5, 16):
-        a.wwa_prob(i, random.random())
-        a.pos_prob(i, random.random())
+        a.wwa_prob(i, (1-a.get_prob(i)[0]) * random.random())
+        a.pos_prob(i, (1-a.get_prob(i)[1]) * random.random())
         a.display()
     a.display()
     a.verify()
