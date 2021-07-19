@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 
 class ProbabilityTable:
@@ -14,25 +15,23 @@ class ProbabilityTable:
         self.expected_were = sum(self.table_werewolf)
 
     def pos_prob(self, index, increment):
+        index -= 1
         if not sum(self.fixed_poss * self.table_possessed):
             if increment == 0 or increment == 1:
                 self.fixed_poss[index] = 1
-                d = increment - self.table_possessed[index]
                 self.table_possessed[index] = increment
             else:
-                d = (1-self.table_possessed[index]) * increment
-                self.table_possessed[index] += d
+                self.table_possessed[index] += (1-self.table_possessed[index]) * increment
             self.propagate(self.table_possessed, self.fixed_poss, index, self.expected_poss)
 
     def wwa_prob(self, index, increment):
+        index -= 1
         if not sum(self.fixed_were * self.table_werewolf) > 3:
             if increment == 0 or increment == 1:
                 self.fixed_were[index] = 1
-                d = increment - self.table_werewolf[index]
                 self.table_werewolf[index] = increment
             else:
-                d = (1 - self.table_werewolf[index]) * increment
-                self.table_werewolf[index] += d
+                self.table_werewolf[index] += (1 - self.table_werewolf[index]) * increment
             self.propagate(self.table_werewolf, self.fixed_were, index, self.expected_were)
 
     def propagate(self, to_normalize, fixed_positions, index, expected):
@@ -42,8 +41,10 @@ class ProbabilityTable:
         if non_zero_one - 1:
             for i in range(to_normalize.size):
                 if not fixed_positions[i] and index != i:
-                    # to_normalize[i] -= d / (non_zero_one - (1-fixed_positions[index]))
                     to_normalize[i] *= alpha
+
+    def get_prob(self, agent_id):
+        return self.table_werewolf[agent_id-1], self.table_possessed[agent_id-1]
 
     def display(self):
         print("Werewolf")
@@ -52,9 +53,9 @@ class ProbabilityTable:
         print(self.table_possessed)
 
     def verify(self):
-        print("Werewolf")
+        print("Werewolf verify")
         print(sum(self.table_werewolf))
-        print("Possessed")
+        print("Possessed verify")
         print(sum(self.table_possessed))
 
 
@@ -69,13 +70,17 @@ def main():
                         )
     a.display()
     a.verify()
-    for i in range(15):
-        a.wwa_prob(i, .8)
+    a.wwa_prob(1, 0)
+    a.wwa_prob(2, 0)
+    a.wwa_prob(3, 0)
+    a.wwa_prob(4, 0)
+    for i in range(5, 16):
+        a.wwa_prob(i, random.random())
+        a.pos_prob(i, random.random())
         a.display()
-    # a.wwa_prob(6, 1)
-    # a.wwa_prob(7, 0)
     a.display()
     a.verify()
+    print(a.get_prob(15))
 
 
 if __name__ == '__main__':
