@@ -30,7 +30,7 @@ class Possessed(grnVillager.Villager):
                 self.previousDivined.pop(player)
         
         if len(self.seers) == 2:
-            allSeers = self.seers.keys()
+            allSeers = list(self.seers.keys())
             allSeers.remove(self.idx)
             self.trueSeer = allSeers[0]
         elif len(self.seers) > 2:
@@ -38,7 +38,8 @@ class Possessed(grnVillager.Villager):
             
         #heuristics:
         #no one else can be possessed
-        self.pt.setu(self.idx, "POSSESSED", 1)
+        self.pt.wwa_prob(self.idx, 1)
+        self.pt.pos_prob(self.idx, 1)
 
     def dayStart(self):
         super().dayStart()
