@@ -35,7 +35,7 @@ class Werewolf(grnVillager.Villager):
         self.grnAttack = -1
         self.push_seer_vote = 0
         self.daily_vote_claim = 0
-        self.me_set = set(self.idx)
+        self.me_set = {self.idx}
 
 
     def update(self, base_info, diff_data, request):
