@@ -35,4 +35,10 @@ class BodyGuard(grnVillager.Villager):
             alive_seers = [i for i in self.seers.keys() if i not in self.dead_seers["execute"] and i not in self.dead_seers["dead"]]
             if len(alive_seers) == 1 and not len(self.dead_seers["dead"]):
                 return int(random.choice(alive_seers))
-        return int(random.sample(self.alive, 1)[0])
+        min_ = self.alive[0]
+        min_val = 0
+        for i in self.alive:
+            if self.pt.get_pro(i) > min_val and i != self.idx:
+                min_val = self.pt.get_pro(i)
+                min_ = i
+        return min_
