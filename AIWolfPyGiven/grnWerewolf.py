@@ -35,6 +35,7 @@ class Werewolf(grnVillager.Villager):
         self.grnAttack = -1
         self.push_seer_vote = 0
         self.daily_vote_claim = 0
+        self.me_set = set(self.idx)
 
 
     def update(self, base_info, diff_data, request):
@@ -193,11 +194,14 @@ class Werewolf(grnVillager.Villager):
         # maxP = -1 #player with max value
         # second = -1
         #first loop find max
-        for player in self.alive.difference(self.WWs):
-            if self.pt.get_prob(player)[0] > max:
-                max = self.pt.get_prob(player)[0]
-                maxP = player
-        return maxP
+        if self.behavior <= 25: # vote against 
+            return random.choice(list(self.WWs.union(self.possessed).intersection(self.alive).difference(self.me_set)))
+        else:
+            for player in self.alive.difference(self.WWs):
+                if self.pt.get_prob(player)[0] > max:
+                    max = self.pt.get_prob(player)[0]
+                    maxP = player
+            return maxP
 
         # #first loop find max
         # for player in self.alive.difference(self.WWs):
@@ -263,6 +267,7 @@ class Werewolf(grnVillager.Villager):
 
     def attack(self): # new
         print('WW Attack reached') #
+        
         return self.grnAttack
         
 
