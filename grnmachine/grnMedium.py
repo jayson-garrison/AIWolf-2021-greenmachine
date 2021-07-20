@@ -42,13 +42,13 @@ class Medium(grnVillager.Villager):
     def talk(self):
         if int(self.base_info['day']) == 1 and not self.hasComeOut:  # We take precedence to come out on day 1
             self.hasComeOut = True
-            return cb.comingout(self.idx, self.idx, "MEDIUM")
+            return cb.comingout('', self.idx, "MEDIUM")
         elif len(self.to_report):  # If we have anything to report, report it
             curr = self.to_report.pop(0)  # I guess we identify the executed players but not the attacked
-            return cb.identified(self.idx, curr[0], curr[1])
+            return cb.identified('', curr[0], curr[1])
         elif len(self.accuse_as_werewolf):
             curr = self.accuse_as_werewolf.pop(0)
-            return cb.estimate(self.idx, curr[0], curr[1])
+            return cb.estimate('', curr[0], curr[1])
         return super().talk()  # If nothing else, return the original talk() (may come out as villager)
 
     def vote(self):

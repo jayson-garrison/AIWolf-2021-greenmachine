@@ -35,7 +35,7 @@ class Werewolf(grnVillager.Villager):
         self.grnAttack = -1
         self.push_seer_vote = 0
         self.daily_vote_claim = 0
-        self.me_set = set(self.idx)
+        self.me_set = {self.idx}
 
 
     def update(self, base_info, diff_data, request):
@@ -165,7 +165,7 @@ class Werewolf(grnVillager.Villager):
         if self.currentDay < 3:
             if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
                     self.hasCO = True
-                    return cb.comingout(self.idx, self.idx, 'VILLAGER')
+                    return cb.comingout('', self.idx, 'VILLAGER')
             elif self.talkTurn < 7:
                 # self.talkTurn += 1
                 # best case, the possessed has signaled day 1
@@ -173,13 +173,13 @@ class Werewolf(grnVillager.Villager):
                     #if self.divined[  list(self.possessed)[0]  ][-1][1] == 'WEREWOLF':
                     if not self.fake_estimate_possessed:
                         self.fake_estimate_possessed = True
-                        return cb.estimate(self.idx, list(self.seer_target)[0], 'POSSESSED')
+                        return cb.estimate('', list(self.seer_target)[0], 'POSSESSED')
                     elif self.daily_vote_claim < 4:
                         self.daily_vote_claim += 1
-                        return cb.vote(self.idx, self.divined[ list(self.possessed)[0] ][-1][0] )
+                        return cb.vote('', self.divined[ list(self.possessed)[0] ][-1][0] )
                 elif list(self.seer_target)[0] in self.alive and self.push_seer_vote < 3:
                     self.push_seer_vote += 1
-                    return cb.vote(self.idx, list(self.seer_target)[0])
+                    return cb.vote('', list(self.seer_target)[0])
                 else:
                     return cb.skip()
         if self.currentDay > 3:
@@ -243,17 +243,17 @@ class Werewolf(grnVillager.Villager):
         print('WW Whisper reached') #
         if not self.hasCO:
             self.hasCO = True
-            return cb.comingout(self.idx, self.idx, "VILLAGER")
+            return cb.comingout('', self.idx, "VILLAGER")
 
         if not self.identify_possessed:
             self.identify_possessed = True
-            return cb.estimate(self.idx, list(self.possessed)[0], 'POSSESSED')
+            return cb.estimate('', list(self.possessed)[0], 'POSSESSED')
 
         if self.daily_vote and self.currentDay > 1:
             self.daily_vote = False
             if len(self.attackVote) > 1:
                 self.grnAttack = self.attackVote[0][1]
-                return cb.vote(self.idx, self.grnAttack)
+                return cb.vote('', self.grnAttack)
             else:
                 if len(self.likely_medium) > 0 and random.randint(0,1) == 0: 
                     self.grnAttack = next(iter(self.likely_medium))
@@ -261,7 +261,7 @@ class Werewolf(grnVillager.Villager):
                     self.grnAttack = next(iter(self.likely_seer))
                 else:
                     self.grnAttack = random.choice(list(self.alive.difference(self.WWs).difference(self.likely_medium).difference(self.likely_seer)))
-                return cb.vote(self.idx, self.grnAttack)
+                return cb.vote('', self.grnAttack)
 
         return cb.over()
 

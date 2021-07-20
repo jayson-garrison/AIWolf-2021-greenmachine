@@ -447,22 +447,25 @@ class Villager(object):
         print('[8]')
         #An agent does not vote for who they say they were going to increase WW aligned
         #take union of each player estimate and votes
-        liarList = [] 
-        for player in self.votes:
-            if player in self.estimate_votes:
-                liarUnion = self.votes[player].union(self.estimate_votes[player])
-                if len(liarUnion) > 0:
-                    liarList.append(list(liarUnion))
-        liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
-        for liar in liarDuplicates:
-            self.likely_possessed.add(liar)
-            self.likely_werewolf.add(liar)
-            #self.pt.update(liar, "WEREWOLF", .15)
-            #self.pt.update(liar, "POSSESSED", .15)
-            self.pt.wwa_prob(liar, self.beta * (1-self.pt.get_prob(liar)[0]))
-            self.pt.pos_prob(liar, self.beta * (1-self.pt.get_prob(liar)[1]))
-        print("LiarList: " + str(liarList))
-        print("LiarDuplicates: " + str(liarDuplicates))
+        try:
+            liarList = [] 
+            for player in self.votes:
+                if player in self.estimate_votes:
+                    liarUnion = self.votes[player].union(self.estimate_votes[player])
+                    if len(liarUnion) > 0:
+                        liarList.append(list(liarUnion))
+            liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
+            for liar in liarDuplicates:
+                self.likely_possessed.add(liar)
+                self.likely_werewolf.add(liar)
+                #self.pt.update(liar, "WEREWOLF", .15)
+                #self.pt.update(liar, "POSSESSED", .15)
+                self.pt.wwa_prob(liar, self.beta * (1-self.pt.get_prob(liar)[0]))
+                self.pt.pos_prob(liar, self.beta * (1-self.pt.get_prob(liar)[1]))
+            print("LiarList: " + str(liarList))
+            print("LiarDuplicates: " + str(liarDuplicates))
+        except Exception: 
+            print('Unrecoverable error regarding 8')
 
         print('[9]')
         #A seer is killed, likely true seer, earlier in the game is more uncertain
@@ -523,15 +526,18 @@ class Villager(object):
                     self.pt.pos_prob(player, self.delta * (1-self.pt.get_prob(player)[1]))
 
         print('[12]')
-        #An agent votes for someone who was executed next round
-        if self.prev_dead in self.prev_votes and self.prev_dead != -1:
-            if self.prev_dead in self.prev_votes.keys():
-                for voter in self.prev_votes[self.prev_dead]:
-                    print("[H] An agent votes for someone who was killed next round:" + voter)
-                    #self.pt.update(voter, "POSSESSED", .3)
-                    #self.pt.update(voter, "WEREWOLF", .3)
-                    self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
-                    self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
+        try:
+            #An agent votes for someone who was executed next round
+            if self.prev_dead in self.prev_votes and self.prev_dead != -1:
+                if self.prev_dead in self.prev_votes.keys():
+                    for voter in self.prev_votes[self.prev_dead]:
+                        print("[H] An agent votes for someone who was killed next round:" + voter)
+                        #self.pt.update(voter, "POSSESSED", .3)
+                        #self.pt.update(voter, "WEREWOLF", .3)
+                        self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
+                        self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
+        except Exception:
+            print('Unrecoverable error regarding 12')
 
         print('[13]')
         #A seer divines a werewolf as human (werewolf status declared by medium)
@@ -596,12 +602,12 @@ class Villager(object):
                 # 30% CO Villager
                 if not self.hasCO and self.role == 'VILLAGER' and len(self.requesters) == 0 and self.behavior <= 30:
                     self.hasCO = True
-                    return cb.comingout(self.idx, self.idx, 'VILLAGER')
+                    return cb.comingout('', self.idx, 'VILLAGER')
                 elif self.talkTurn < 5:
                     if len(self.seers) > 1:
                         for targ in self.seers:
                             if self.seers[targ] > 0:
-                                return cb.vote(self.idx, targ)
+                                return cb.vote('', targ)
                         return cb.skip()
                     else:
                         return cb.skip()
@@ -620,7 +626,7 @@ class Villager(object):
                 elif len(self.seers) == 1 and next(iter(self.seers.values())) in self.unaccused:
                     self.unaccused.remove(next(iter(self.seers.values())))
                     self.likely_human.add(next(iter(self.seers.values())))
-                    return cb.estimate(self.idx, next(iter(self.seers.values())), "SEER")
+                    return cb.estimate('', next(iter(self.seers.values())), "SEER")
                 else:
                     return cb.skip()
                 
@@ -632,7 +638,7 @@ class Villager(object):
                 if len(self.likely_medium) == 1:
                     if self.true_medium_state == 0:
                         self.true_medium_state += 1
-                        return cb.estimate(self.idx, list(self.likely_medium)[0], 'MEDIUM' )
+                        return cb.estimate('', list(self.likely_medium)[0], 'MEDIUM' )
                     #if self.true_medium_state == 1:
                     else:
                         self.repeatMediumLogic += 1
@@ -641,15 +647,16 @@ class Villager(object):
                 elif len(self.likely_seer) == 1:
                     if self.true_seer_state == 0:
                         self.true_seer_state += 1
-                        return cb.estimate(self.idx, list(self.likely_seer)[0], 'SEER' )
+                        return cb.estimate('', list(self.likely_seer)[0], 'SEER' )
                     #if self.true_seer_state == 1:
                     else:
                         self.true_seer_state += 1
                         return cb.because(self.idx, cb.estimate(self.idx, list(self.likely_seer[0], 'SEER' )), cb.comingout(list(self.likely_seer)[0], list(self.likely_medium)[0], 'SEER') )
                 # claim to vote someone, need probTable
                 elif self.daily_push_vote < 3: 
-                    self.daily_push_vote += 1
-                    return cb.vote(self.idx, 1)
+                    # self.daily_push_vote += 1
+                    # return cb.vote('', 1)
+                    pass
                 else: return cb.over() # talk
             return cb.over() # JH: You need this extra one because the 'if/else' structure allowed some situations where nothing returned
         else:

@@ -55,7 +55,7 @@ class Possessed(grnVillager.Villager):
                 #print("[+] REACHED DAY 1. DD =" + str(self.daily_divine))
                 if not self.hasCO:
                     self.hasCO = True
-                    return cb.comingout(self.idx, self.idx, 'SEER')
+                    return cb.comingout('', self.idx, 'SEER')
                 elif self.daily_divine:
                     #print("[+] REACHED DAILY DIVINE DAY 1")
                     self.daily_divine = False
@@ -69,7 +69,7 @@ class Possessed(grnVillager.Villager):
                     return self.fakedivine("WEREWOLF")
                 elif self.daily_vote < 4:
                     self.daily_vote += 1
-                    return cb.vote(self.idx, list(self.previousDivined.keys)[-1]) #CHECK IF WORKS
+                    return cb.vote('', list(self.previousDivined.keys)[-1]) #CHECK IF WORKS
                 else:
                     return cb.over()
             else: #day 3+
@@ -86,7 +86,7 @@ class Possessed(grnVillager.Villager):
                     self.daily_vote += 1
                     for player in set(self.previousDivined.keys()).difference(self.dead):
                         if self.previousDivined[player] == "WEREWOLF":
-                            return cb.vote(self.idx, player)
+                            return cb.vote('', player)
                     return cb.over()
                         
 
@@ -118,4 +118,4 @@ class Possessed(grnVillager.Villager):
         except: #empty list
             return cb.skip()
         self.previousDivined[target] = role
-        return cb.divined(self.idx, target, role)
+        return cb.divined('', target, role)

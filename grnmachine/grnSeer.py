@@ -39,20 +39,26 @@ class Seer(grnVillager.Villager):
                 self.fake_seers.add(poser)
                 self.certain_ww_aligned.add(poser)
             
-
+        
         # parse diff_data for divs
         if request == 'DAILY_INITIALIZE':
+            print('KKKKKKKKKKKKKKKKKKKKKKKK step in div KKKKKKKKKKKKKKKKKKKKKKKKKK')
             for row in diff_data.itertuples():
                 type = getattr(row,"type")
                 text = getattr(row,"text")
                 # adding to sets based on divs
                 if type == 'divine':
-                    self.current_div_as_HU.clear()
-                    self.current_div_as_WW.clear()
-                    if text[18:] == 'HUMAN':
+                    print('///////////////////////reading DIVINE//////////////////////////////')
+                    self.current_div_as_HU = set()
+                    self.current_div_as_WW = set()
+                    print(self.current_div_as_HU)
+                    print(self.current_div_as_WW)
+                    if text.split()[-1] == 'HUMAN':
+                        print('///////////////////////reading DIVINE////////////////////////////// HU' + str(getattr(row, 'agent')))
                         self.divHU.append( int(getattr(row, 'agent')) )
                         self.current_div_as_HU.add( int(getattr(row, 'agent')) )
                     else:
+                        print('///////////////////////reading DIVINE////////////////////////////// WW' + str(getattr(row, 'agent')))
                         self.divWW.append( int(getattr(row, 'agent')) )
                         self.current_div_as_WW.add( int(getattr(row, 'agent')) )
         
@@ -99,12 +105,12 @@ class Seer(grnVillager.Villager):
             # always CO as seer
             if not self.hasCO:
                 self.hasCO = True
-                return cb.comingout(self.idx, self.idx, 'SEER')
+                return cb.comingout('', self.idx, 'SEER')
             # div HU day 0, report
             elif not self.daily_div_claim:
                 if len(self.current_div_as_HU) != 0: 
                     self.daily_div_claim = True
-                    return cb.divined(self.idx, list(self.current_div_as_HU)[-1], 'HUMAN')
+                    return cb.divined('', list(self.current_div_as_HU)[-1], 'HUMAN')
                 # if div WW then skip
                 else: 
                     self.divined_WW_day_0 = True
@@ -162,7 +168,7 @@ class Seer(grnVillager.Villager):
                 self.daily_div_claim = True
                 if self.divined_WW_day_0:
                     if self.currentDay == 2:
-                        return cb.divined(self.idx, self.divWW[0], 'WEREWOLF')
+                        return cb.divined('', self.divWW[0], 'WEREWOLF')
                     # all that follows is the unlikely case that we div WW 3 times in a row
                     elif len(self.current_div_as_WW) != 0:
 
@@ -171,22 +177,22 @@ class Seer(grnVillager.Villager):
                             # return cb.divined(self.idx, list(self.divWW)[0], 'WEREWOLF')
                         elif self.currentDay == 3 and self.consecutive_WW_div == 1:
                             self.consecutive_WW_div = 2
-                            return cb.divined(self.idx, self.divWW[1], 'WEREWOLF')
+                            return cb.divined('', self.divWW[1], 'WEREWOLF')
 
                         elif self.currentDay == 4 and self.consecutive_WW_div == 2:
-                            return cb.divined(self.idx, self.divWW[-1], 'WEREWOLF')
+                            return cb.divined('', self.divWW[-1], 'WEREWOLF')
                         else:
-                            return cb.divined(self.idx, self.divWW[-1], 'WEREWOLF')
+                            return cb.divined('', self.divWW[-1], 'WEREWOLF')
                     # else play the game as if one behind in div claims
                     
                     else:
-                        return cb.divined(self.idx, self.divHU[-2], 'HUMAN')
+                        return cb.divined('', self.divHU[-2], 'HUMAN')
                 # div WW, report
                 else:
                     if len(self.current_div_as_WW) != 0:
-                        return cb.divined(self.idx, list(self.current_div_as_WW)[-1], 'WEREWOLF')
+                        return cb.divined('', list(self.current_div_as_WW)[-1], 'WEREWOLF')
                     else:
-                        return cb.divined(self.idx, list(self.current_div_as_HU)[-1], 'HUMAN')
+                        return cb.divined('', list(self.current_div_as_HU)[-1], 'HUMAN')
 
             # if len(self.current_div_as_WW) != 0:
             #     print('CURRENT DIV WW')
@@ -226,9 +232,9 @@ class Seer(grnVillager.Villager):
             elif self.daily_push_vote < 4:
                 self.daily_push_vote += 1
                 if len(self.targets) != 0:
-                    return cb.vote(self.idx, self.targets[0])
+                    return cb.vote('', self.targets[0])
                 else:
-                    return cb.vote(self.idx, list(self.fake_seers)[0])
+                    return cb.vote('', list(self.fake_seers)[0])
             else:
                 return cb.over()
         else: 

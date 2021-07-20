@@ -7,27 +7,45 @@ def estimate(subject, target, role):
 
 
 def comingout(subject, target, role):
-    return 'Agent[' + "{0:02d}".format(subject) + '] COMINGOUT Agent[' + "{0:02d}".format(target) + '] ' + role
+    if subject == '':
+        return 'COMINGOUT Agent[' + "{0:02d}".format(target) + '] ' + role
+    else:
+        return 'Agent[' + "{0:02d}".format(subject) + '] COMINGOUT Agent[' + "{0:02d}".format(target) + '] ' + role
 
 # 2.2 should be good, the "I will do [action]"
 def divinization(subject, target):
     return 'Agent[' + "{0:02d}".format(subject) + '] DIVINIZATION Agent[' + "{0:02d}".format(target) + ']'
     
 def guard(subject, target):
-    return 'Agent[' + "{0:02d}".format(subject) + '] GUARD Agent[' + "{0:02d}".format(target) + ']'
+    if subject == '':
+        return 'GUARD Agent[' + "{0:02d}".format(target) + ']'
+    else:
+        return 'Agent[' + "{0:02d}".format(subject) + '] GUARD Agent[' + "{0:02d}".format(target) + ']'
     
 def vote(subject, target):
-    return 'Agent[' + "{0:02d}".format(subject) + '] VOTE Agent[' + "{0:02d}".format(target) + ']'
+    if subject == '':
+        return 'VOTE Agent[' + "{0:02d}".format(target) + ']'
+    else: 
+        return 'Agent[' + "{0:02d}".format(subject) + '] VOTE Agent[' + "{0:02d}".format(target) + ']'
 
 def attack(subject, target):
-    return 'Agent[' + "{0:02d}".format(subject) + '] ATTACK Agent[' + "{0:02d}".format(target) + ']'
+    if subject == '':
+        return 'ATTACK Agent[' + "{0:02d}".format(target) + ']'
+    else:
+        return 'Agent[' + "{0:02d}".format(subject) + '] ATTACK Agent[' + "{0:02d}".format(target) + ']'
 
 # 2.3 should be good
 def divined(subject, target, species):
-    return 'Agent[' + "{0:02d}".format(subject) + '] DIVINED Agent[' + "{0:02d}".format(target) + '] ' + species
+    if subject == '':
+        return 'DIVINED Agent[' + "{0:02d}".format(target) + '] ' + species
+    else:
+        return 'Agent[' + "{0:02d}".format(subject) + '] DIVINED Agent[' + "{0:02d}".format(target) + '] ' + species
 
 def identified(subject, target, species):
-    return 'Agent[' + "{0:02d}".format(subject) + '] IDENTIFIED Agent[' + "{0:02d}".format(target) + '] ' + species
+    if subject == '':
+        return 'IDENTIFIED Agent[' + "{0:02d}".format(target) + '] ' + species
+    else:
+        return 'Agent[' + "{0:02d}".format(subject) + '] IDENTIFIED Agent[' + "{0:02d}".format(target) + '] ' + species
 
 def guarded(subject, target):
     return 'Agent[' + "{0:02d}".format(subject) + '] GUARDED Agent[' + "{0:02d}".format(target) + ']'
