@@ -120,13 +120,7 @@ class Villager(object):
         self.daily_push_vote = 0
 
         #self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
-<<<<<<< HEAD:grnmachine/grnVillager.py
-        self.pt = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1},
-                         15
-                        )
-=======
         self.pt = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1}, 15)
->>>>>>> main:AIWolfPyGiven/grnVillager.py
         self.alpha = .1
         self.beta = .15
         self.gamma = .2
