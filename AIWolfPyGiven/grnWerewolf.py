@@ -265,10 +265,16 @@ class Werewolf(grnVillager.Villager):
 
         return cb.over()
 
-    def attack(self): # new
+    def attack(self): # returns the least sus player, not POS or WW
         print('WW Attack reached') #
-        
-        return self.grnAttack
+        min = 10
+        for player in self.alive.difference(self.WWs).difference(self.possessed):
+                if self.pt.get_prob(player)[0] < min:
+                    min = self.pt.get_prob(player)[0]
+                    minP = player
+        return minP
+
+        # return self.grnAttack
         
 
     def finish(self):
