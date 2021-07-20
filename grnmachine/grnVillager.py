@@ -121,8 +121,7 @@ class Villager(object):
 
         #self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
         self.pt = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1},
-                         ["Player1", "Player2", "Player3", "Player4", "Player5", "Player6", "Player7", "Player8",
-                          "Player9", "Player10", "Player11", "Player12", "Player13", "Player14", "Player15"],
+                         15
                         )
         self.alpha = .1
         self.beta = .15

@@ -4,6 +4,7 @@ import random
 
 class ProbabilityTable:
     def __init__(self, roles, num_players):
+        num_players = int(num_players)
         self.table_possessed = np.zeros(num_players)
         self.table_werewolf = np.zeros(num_players)  # WW Aligned
         self.fixed_poss = np.zeros(self.table_possessed.size)
