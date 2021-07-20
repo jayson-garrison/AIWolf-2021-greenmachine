@@ -99,7 +99,6 @@ class Seer(grnVillager.Villager):
 
     def talk(self):
         #super().talk()
-
         # day 1 logic
         if self.currentDay == 1:
             # always CO as seer

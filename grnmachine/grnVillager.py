@@ -459,14 +459,14 @@ class Villager(object):
         print('[8]')
         #An agent does not vote for who they say they were going to increase WW aligned
         #take union of each player estimate and votes
-<<<<<<< HEAD:grnmachine/grnVillager.py
         try:
             liarList = [] 
             for player in self.votes:
                 if player in self.estimate_votes:
                     liarUnion = self.votes[player].union(self.estimate_votes[player])
                     if len(liarUnion) > 0:
-                        liarList.append(list(liarUnion))
+                        for liarUnionItem in liarUnion:
+                            liarList.append(int(liarUnionItem))
             liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
             for liar in liarDuplicates:
                 self.likely_possessed.add(liar)
@@ -479,25 +479,7 @@ class Villager(object):
             print("LiarDuplicates: " + str(liarDuplicates))
         except Exception: 
             print('Unrecoverable error regarding 8')
-=======
-        liarList = [] 
-        for player in self.votes:
-            if player in self.estimate_votes:
-                liarUnion = self.votes[player].union(self.estimate_votes[player])
-                if len(liarUnion) > 0:
-                    for liarUnionItem in liarUnion:
-                        liarList.append(int(liarUnionItem))
-        liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
-        for liar in liarDuplicates:
-            self.likely_possessed.add(liar)
-            self.likely_werewolf.add(liar)
-            #self.pt.update(liar, "WEREWOLF", .15)
-            #self.pt.update(liar, "POSSESSED", .15)
-            self.pt.wwa_prob(liar, self.beta * (1-self.pt.get_prob(liar)[0]))
-            self.pt.pos_prob(liar, self.beta * (1-self.pt.get_prob(liar)[1]))
-        print("LiarList: " + str(liarList))
-        print("LiarDuplicates: " + str(liarDuplicates))
->>>>>>> grey:AIWolfPyGiven/grnVillager.py
+        
 
         print('[9]')
         #A seer is killed, likely true seer, earlier in the game is more uncertain
@@ -558,20 +540,6 @@ class Villager(object):
                     self.pt.pos_prob(player, self.delta * (1-self.pt.get_prob(player)[1]))
 
         print('[12]')
-<<<<<<< HEAD:grnmachine/grnVillager.py
-        try:
-            #An agent votes for someone who was executed next round
-            if self.prev_dead in self.prev_votes and self.prev_dead != -1:
-                if self.prev_dead in self.prev_votes.keys():
-                    for voter in self.prev_votes[self.prev_dead]:
-                        print("[H] An agent votes for someone who was killed next round:" + voter)
-                        #self.pt.update(voter, "POSSESSED", .3)
-                        #self.pt.update(voter, "WEREWOLF", .3)
-                        self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
-                        self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
-        except Exception:
-            print('Unrecoverable error regarding 12')
-=======
         #An agent votes for someone who was executed next round
         if self.prev_dead in self.prev_votes and self.prev_dead != -1:
             if self.prev_dead in self.prev_votes.keys():
@@ -581,7 +549,6 @@ class Villager(object):
                     #self.pt.update(voter, "WEREWOLF", .3)
                     self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
                     self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
->>>>>>> grey:AIWolfPyGiven/grnVillager.py
 
         print('[13]')
         #A seer divines a werewolf as human (werewolf status declared by medium)
