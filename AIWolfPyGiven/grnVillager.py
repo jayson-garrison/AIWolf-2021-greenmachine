@@ -24,6 +24,7 @@ import logging, json
 import random
 from CheatCodes import CheatCodes
 from probabilityTable import ProbabilityTable
+import re
 
 myname = 'greenmachine'
 
@@ -210,13 +211,19 @@ class Villager(object):
             # if 'BECAUSE' or 'XOR' or 'OR' or 'AND' or 'REQUEST' or 'ESTIMATE' or 'DAY' or 'INQUIRE' or 'ATTACKED' or 'VOTED' in self.agent_talks[self.nthTalk][2]:
             #     pass
             # agent 0
+
+            #to get the target list
+            targ_list = list(map(int, re.findall(r'\d+', self.agent_talks[self.nthTalk][2])))
+            string_list = self.agent_talks[self.nthTalk][2].split()
+            # gets [6, 6] from "Agent6 COMINGOUT Agent6 SEER"
+
             if "VOTE" in self.agent_talks[self.nthTalk][2]:
                 print('reached VOTE')
                 voter = self.agent_talks[self.nthTalk][1]
-                voted = int( self.agent_talks[self.nthTalk][2][11:13] )
+                voted = targ_list[-1] #int( self.agent_talks[self.nthTalk][2][11:13] )
                 for key_voted in self.estimate_votes:
                     if voter in self.estimate_votes[key_voted]:
-                        self.estimate_votes[key_voted].popitem(voter)
+                        self.estimate_votes[key_voted].remove(voter)
                 self.estimate_votes[voted].add(voter)
                 print(self.estimate_votes) #
 
@@ -224,19 +231,23 @@ class Villager(object):
                 print('reached COs') #
                 who = self.agent_talks[self.nthTalk][1]
                 # print(who)
-                subject = int( self.agent_talks[self.nthTalk][2][16:18] )
+                whot = targ_list[-1]
+                subject = string_list[-1] #int( self.agent_talks[self.nthTalk][2][16:18] )
                 # print(subject)
 
-                if who == subject:
-                    self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
+                if who == whot:
+                    #self.COs[who].add(self.agent_talks[self.nthTalk][2][20:])
+                    self.COs[who].add(subject)
                     # consider else if an agent CO for another is significant
-                    if self.agent_talks[self.nthTalk][2][20:] == "SEER" and not (who in self.seers):
+                    #if self.agent_talks[self.nthTalk][2][20:] == "SEER" and not (who in self.seers):
+                    if subject == "SEER" and not (who in self.seers):
                         #self.seers.add(self.agent_talks[self.nthTalk][1])
                         self.seers[self.agent_talks[self.nthTalk][1]] = 0
                         print('seers:')
                         print(self.seers) #
 
-                    elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and not (who in self.mediums):
+                    # elif self.agent_talks[self.nthTalk][2][20:] == "MEDIUM" and not (who in self.mediums):
+                    elif subject == "MEDIUM" and not (who in self.mediums):
                         #self.mediums.add(self.agent_talks[self.nthTalk][1])
                         self.mediums[self.agent_talks[self.nthTalk][1]] = 0
                         print('mediums:')
@@ -250,8 +261,8 @@ class Villager(object):
             elif "DIVINED" in self.agent_talks[self.nthTalk][2]:
                 print('reached DIV')
                 # add to diviners
-                target = int(self.agent_talks[self.nthTalk][2][14:16])
-                species = self.agent_talks[self.nthTalk][2][18:]
+                target = targ_list[-1] #int(self.agent_talks[self.nthTalk][2][14:16])
+                species = string_list[-1] #self.agent_talks[self.nthTalk][2][18:]
                 if self.agent_talks[self.nthTalk][1] in self.divined: #not the first divine
                     self.divined[self.agent_talks[self.nthTalk][1]].append([target, species])
                 else: #first divine
@@ -269,8 +280,8 @@ class Villager(object):
             elif "IDENTIFIED" in self.agent_talks[self.nthTalk][2]:
                 print('reached IDE')
                 # add to likely mediums 
-                target = int(self.agent_talks[self.nthTalk][2][17:19])
-                species = self.agent_talks[self.nthTalk][2][21:]
+                target = targ_list[-1] #int(self.agent_talks[self.nthTalk][2][17:19])
+                species = string_list[-1] #self.agent_talks[self.nthTalk][2][21:]
                 if self.agent_talks[self.nthTalk][1] in self.identified: #not the first divine
                     self.identified[self.agent_talks[self.nthTalk][1]].append([target, species])
                 else: #first divine
@@ -286,7 +297,8 @@ class Villager(object):
 
             elif "GUARDED" in self.agent_talks[self.nthTalk][2]:
                 # add to likely bodyguard
-                self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
+                pass
+                #self.bodyguards.add(self.agent_talks[self.nthTalk][2][6:8])
         
             '''
             # agent 0.5
@@ -567,6 +579,13 @@ class Villager(object):
         print(self.killed) #
         print('EXECUTED:') #
         print(self.executed) #
+
+        print('DIVINED')
+        print(self.divined)
+        print('SEERS')
+        print(self.seers)
+        print('IDENTIFIED')
+        print(self.identified)
 
         # resets
         self.nthTalk = -1
