@@ -120,9 +120,13 @@ class Villager(object):
         self.daily_push_vote = 0
 
         #self.pt = CheatCodes({ "WEREWOLF":3, "POSSESSED":1, "SEER":1, "MEDIUM":1, "V/BG":9 })
+<<<<<<< HEAD:grnmachine/grnVillager.py
         self.pt = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1},
                          15
                         )
+=======
+        self.pt = ProbabilityTable({"Werewolf": 3, "Possessed": 1, "Villager": 8, "Bodyguard": 1, "Medium": 1, "Seer": 1}, 15)
+>>>>>>> main:AIWolfPyGiven/grnVillager.py
         self.alpha = .1
         self.beta = .15
         self.gamma = .2
@@ -321,7 +325,7 @@ class Villager(object):
         print('[1]')
         # if only 1 medium CO that medium is trustworthy
         if len(self.mediums) == 1 and self.currentDay != 1:
-            print("[H] if only 1 medium CO that medium is trustworthy: " + next(iter(self.mediums.keys())))
+            print("[H] if only 1 medium CO that medium is trustworthy: " + str(next(iter(self.mediums.keys()))))
             self.likely_medium.add( next(iter(self.mediums.keys())) )
             self.likely_human.add( next(iter(self.mediums.keys())) )
             #self.pt.setu(next(iter(self.mediums.keys())), "MEDIUM", 1)
@@ -464,6 +468,7 @@ class Villager(object):
             self.pt.wwa_prob(liar, self.beta * (1-self.pt.get_prob(liar)[0]))
             self.pt.pos_prob(liar, self.beta * (1-self.pt.get_prob(liar)[1]))
         print("LiarList: " + str(liarList))
+        print("LiarDuplicates: " + str(liarDuplicates))
 
         print('[9]')
         #A seer is killed, likely true seer, earlier in the game is more uncertain
@@ -509,14 +514,14 @@ class Villager(object):
         #An agent votes for an accepted medium or seer, likely WW
         for player in self.alive:
             for medium in self.likely_medium:
-                if player in self.votes[medium]:
+                if medium in self.votes and player in self.votes[medium]:
                     print("[H] An agent votes for an accepted medium or seer, likely WW [M]")
                     #self.pt.update(liar, "WEREWOLF", .2)
                     #self.pt.update(liar, "POSSESSED", .2)
                     self.pt.wwa_prob(player, self.delta * (1-self.pt.get_prob(player)[0]))
                     self.pt.pos_prob(player, self.delta * (1-self.pt.get_prob(player)[1]))
             for seer in self.likely_seer:
-                if player in self.votes[seer]:
+                if seer in self.votes and player in self.votes[seer]:
                     print("[H] An agent votes for an accepted medium or seer, likely WW [S]")
                     #self.pt.update(liar, "WEREWOLF", .2)
                     #self.pt.update(liar, "POSSESSED", .2)
@@ -526,22 +531,24 @@ class Villager(object):
         print('[12]')
         #An agent votes for someone who was executed next round
         if self.prev_dead in self.prev_votes and self.prev_dead != -1:
-            for voter in self.prev_votes[self.prev_dead]:
-                print("[H] An agent votes for someone who was killed next round:" + voter)
-                #self.pt.update(voter, "POSSESSED", .3)
-                #self.pt.update(voter, "WEREWOLF", .3)
-                self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
-                self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
+            if self.prev_dead in self.prev_votes.keys():
+                for voter in self.prev_votes[self.prev_dead]:
+                    print("[H] An agent votes for someone who was killed next round:" + voter)
+                    #self.pt.update(voter, "POSSESSED", .3)
+                    #self.pt.update(voter, "WEREWOLF", .3)
+                    self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
+                    self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
 
         print('[13]')
         #A seer divines a werewolf as human (werewolf status declared by medium)
+        
         for seer in self.divined:
             for seerPair in  self.divined[seer]:
                 for medium in self.identified:
                     for mediumPair in self.identified[medium]:
                         if seerPair[0] == mediumPair[0] and seerPair[1] != mediumPair[1]: #same name different identities
                             print("[H] A seer divines a werewolf as human (werewolf status declared by medium)")
-                            print(' - seer: ' + str(seer) + " medium: " + str(medium) + "target:" + seerPair[0])
+                            print(' - seer: ' + str(seer) + " medium: " + str(medium) + "target:" + str(seerPair[0]))
                             #self.pt.setu(seer, "POSSESSED", .5)
                             #self.pt.setu(seer, "WEREWOLF", .5) 
                             self.pt.wwa_prob(seer, 1)

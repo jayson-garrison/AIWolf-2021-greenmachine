@@ -35,6 +35,7 @@ class Werewolf(grnVillager.Villager):
         self.grnAttack = -1
         self.push_seer_vote = 0
         self.daily_vote_claim = 0
+        self.me_set = set(self.idx)
 
 
     def update(self, base_info, diff_data, request):
@@ -54,6 +55,7 @@ class Werewolf(grnVillager.Villager):
                 print('REACHED POS CASE 1')
                 self.possessed.add(agent)
                 self.seer_target = self.seer_target.difference(self.possessed).difference(self.WWs)
+                self.pt.pos_prob(agent, 1)
             else:
                 print('REACHED POS CASE 3')
                 self.seer_target.add(agent)
@@ -68,6 +70,7 @@ class Werewolf(grnVillager.Villager):
             if agent not in self.WWs and (( ids[0] in self.WWs and ids[1] == 'HUMAN' ) or ( divs[0] in self.dead and divs[1] == 'WEREWOLF' )):
                 self.possessed.add(agent)
                 self.medium_target = self.medium_target.difference(self.possessed).difference(self.WWs)
+                self.pt.pos_prob(agent, 1)
             #elif ids[0] in self.WWs and ids[1] == 'WEREWOLF':'
             else:
                 self.medium_target.add(agent)
@@ -186,46 +189,55 @@ class Werewolf(grnVillager.Villager):
 
     def vote(self): # new
         logging.debug("# VOTE")
-        self.pt.print()
+        self.pt.display()
         max = -1
-        maxP = -1 #player with max value
-        second = -1
-
+        # maxP = -1 #player with max value
+        # second = -1
         #first loop find max
-        for player in self.alive.difference(self.WWs):
-            if self.pt.get(player, "WEREWOLF") > max:
-                max = self.pt.get(player, "WEREWOLF")
-                maxP = player
-
-            #remove if columns w & p merge
-            if self.pt.get(player, "POSSESSED") > max:
-                max = self.pt.get(player, "POSSESSED")
-                maxP = player
-        
-        #second loop find second max
-        for player in self.alive.difference(self.WWs):
-            if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
-                second = self.pt.get(player, "WEREWOLF")
-
-            #remove if columns w & p merge
-            if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
-                second = self.pt.get(player, "POSSESSED")
-        
-        #finally compare and decide if voting in majority
-        
-        if max - second < .5 and self.currentDay < 4:
-            #if day num low and difference small, vote majority
-            majority = -1
-            majorityP = -1
-            for player in self.estimate_votes:
-                if len(self.estimate_votes[player]) > majority and player not in self.WWs:
-                    majority = len(self.estimate_votes[player])
-                    majorityP = player
-            return majorityP
-
+        if self.behavior <= 25: # vote against 
+            return random.choice(list(self.WWs.union(self.possessed).intersection(self.alive).difference(self.me_set)))
         else:
-            #difference great or day num high enough to have sufficient data..
+            for player in self.alive.difference(self.WWs):
+                if self.pt.get_prob(player)[0] > max:
+                    max = self.pt.get_prob(player)[0]
+                    maxP = player
             return maxP
+
+        # #first loop find max
+        # for player in self.alive.difference(self.WWs):
+        #     if self.pt.get(player, "WEREWOLF") > max:
+        #         max = self.pt.get(player, "WEREWOLF")
+        #         maxP = player
+
+        #     #remove if columns w & p merge
+        #     if self.pt.get(player, "POSSESSED") > max:
+        #         max = self.pt.get(player, "POSSESSED")
+        #         maxP = player
+        
+        # #second loop find second max
+        # for player in self.alive.difference(self.WWs):
+        #     if self.pt.get(player, "WEREWOLF") > second and self.pt.get(player, "WEREWOLF") != max:
+        #         second = self.pt.get(player, "WEREWOLF")
+
+        #     #remove if columns w & p merge
+        #     if self.pt.get(player, "POSSESSED") > second and self.pt.get(player, "POSSESSED") != max:
+        #         second = self.pt.get(player, "POSSESSED")
+        
+        # #finally compare and decide if voting in majority
+        
+        # if max - second < .5 and self.currentDay < 4:
+        #     #if day num low and difference small, vote majority
+        #     majority = -1
+        #     majorityP = -1
+        #     for player in self.estimate_votes:
+        #         if len(self.estimate_votes[player]) > majority and player not in self.WWs:
+        #             majority = len(self.estimate_votes[player])
+        #             majorityP = player
+        #     return majorityP
+
+        # else:
+        #     #difference great or day num high enough to have sufficient data..
+        #     return maxP
 
     def whisper(self): # attack and vote 
         print('WW Whisper reached') #
@@ -253,9 +265,16 @@ class Werewolf(grnVillager.Villager):
 
         return cb.over()
 
-    def attack(self): # new
+    def attack(self): # returns the least sus player, not POS or WW
         print('WW Attack reached') #
-        return self.grnAttack
+        min = 10
+        for player in self.alive.difference(self.WWs).difference(self.possessed):
+                if self.pt.get_prob(player)[0] < min:
+                    min = self.pt.get_prob(player)[0]
+                    minP = player
+        return minP
+
+        # return self.grnAttack
         
 
     def finish(self):
