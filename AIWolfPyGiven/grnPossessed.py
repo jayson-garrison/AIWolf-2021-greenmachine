@@ -111,7 +111,7 @@ class Possessed(grnVillager.Villager):
 
     def fakedivine(self, role):
         try:
-            targSet = self.alive.difference({self.idx}).difference(self.likely_seer).difference(set(self.previousDivined.keys()))
+            targSet = self.alive.difference({self.idx}).difference(set(self.seers.keys())).difference(set(self.previousDivined.keys()))
             if self.trueSeer > 0 and targSet.difference(set(self.divined[self.trueSeer])):
                 target = targSet.difference(set(self.divined[self.trueSeer]))
             else: target = random.choice(list(targSet))

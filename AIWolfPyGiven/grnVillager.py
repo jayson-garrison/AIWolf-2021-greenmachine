@@ -464,7 +464,8 @@ class Villager(object):
             if player in self.estimate_votes:
                 liarUnion = self.votes[player].union(self.estimate_votes[player])
                 if len(liarUnion) > 0:
-                    liarList.append(list(liarUnion))
+                    for liarUnionItem in liarUnion:
+                        liarList.append(int(liarUnionItem))
         liarDuplicates = set([x for x in liarList if liarList.count(x) > 1])
         for liar in liarDuplicates:
             self.likely_possessed.add(liar)
@@ -542,8 +543,8 @@ class Villager(object):
                     print("[H] An agent votes for someone who was killed next round:" + voter)
                     #self.pt.update(voter, "POSSESSED", .3)
                     #self.pt.update(voter, "WEREWOLF", .3)
-                    self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
-                    self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(player)[0]))
+                    self.pt.wwa_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
+                    self.pt.pos_prob(voter, self.epsilon * (1-self.pt.get_prob(voter)[0]))
 
         print('[13]')
         #A seer divines a werewolf as human (werewolf status declared by medium)
